@@ -1,748 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Our Quiet Safe Space</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        cream: {
-                            50: '#FAF7F5',
-                            100: '#F5EFEB',
-                            200: '#EBE3DB',
-                            300: '#DCD0C4',
-                        },
-                        slateDark: {
-                            500: '#756D67',
-                            700: '#4A4441',
-                            800: '#2C2A29',
-                        },
-                        dustyRose: {
-                            100: '#F8EBEB',
-                            200: '#F2D6D6',
-                            300: '#E6B8B8',
-                            400: '#D99898',
-                            500: '#C87878',
-                        },
-                        softAmber: {
-                            100: '#FDF6E2',
-                            200: '#F7E6B8',
-                            400: '#E2B858',
-                        }
-                    },
-                    fontFamily: {
-                        cormorant: ['Cormorant Garamond', 'serif'],
-                        caveat: ['Caveat', 'cursive'],
-                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        :root {
-            --sat: env(safe-area-inset-top, 0px);
-            --sab: env(safe-area-inset-bottom, 0px);
-            --sal: env(safe-area-inset-left, 0px);
-            --sar: env(safe-area-inset-right, 0px);
-        }
-
-        body {
-            background-color: #FAF7F5;
-            color: #2C2A29;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            touch-action: manipulation;
-        }
-
-        /* Mobile Safe Area Insets */
-        .safe-pt { padding-top: max(1rem, var(--sat)); }
-        .safe-pb { padding-bottom: max(1rem, var(--sab)); }
-        .safe-p-all { 
-            padding-top: max(1rem, var(--sat)); 
-            padding-bottom: max(1rem, var(--sab));
-            padding-left: max(1rem, var(--sal));
-            padding-right: max(1rem, var(--sar));
-        }
-
-        /* Canvas Overlay */
-        #doodleCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Washi Tape Effect */
-        .washi-tape {
-            background: rgba(220, 208, 196, 0.65);
-            backdrop-filter: blur(2px);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-            border-left: 2px dashed rgba(180, 160, 140, 0.35);
-            border-right: 2px dashed rgba(180, 160, 140, 0.35);
-        }
-
-        /* Scrapbook Paper Texture */
-        .scrapbook-paper {
-            background-color: #FAF7F5;
-            background-image: radial-gradient(#DCD0C4 0.5px, transparent 0.5px);
-            background-size: 20px 20px;
-        }
-
-        /* 3D Flip Card */
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-3d {
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .backface-hidden {
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
-
-        /* Smooth Page Fade */
-        .page-fade-out {
-            opacity: 0;
-            transform: scale(0.98);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: none;
-        }
-        .page-fade-in {
-            animation: mobileFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes mobileFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Custom Touch Ripple / Active State */
-        .touch-btn {
-            transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .touch-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* Smooth Hide Collapsible */
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease, padding 0.3s ease;
-            opacity: 0;
-        }
-        .accordion-content.open {
-            max-height: 500px;
-            opacity: 1;
-            transition: max-height 0.5s ease-in-out, opacity 0.4s ease 0.1s, padding 0.3s ease;
-        }
-
-        /* Typewriter Cursor */
-        .typewriter-cursor::after {
-            content: '|';
-            animation: blink 0.8s infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Custom Mobile Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #DCD0C4; border-radius: 4px; }
-    </style>
-</head>
-<body class="min-h-screen relative flex flex-col justify-between selection:bg-dustyRose-200">
-
-    <!-- Subtle Ambient Canvas for Soft Floating Hearts & Doodles -->
-    <canvas id="doodleCanvas"></canvas>
-
-    <!-- MAIN WRAPPER -->
-    <div id="app" class="relative z-10 w-full min-h-screen flex flex-col justify-between">
-
-        <!-- ============================================================ -->
-        <!-- PAGE 1: MINIMALIST LANDING PAGE (MOBILE FIRST)              -->
-        <!-- ============================================================ -->
-        <main id="page1" class="min-h-screen w-full flex flex-col items-center justify-between px-6 safe-p-all text-center">
-            
-            <!-- Top Subtle Brand/Header -->
-            <div class="pt-4">
-                <span class="font-cormorant italic text-sm sm:text-base text-slateDark-500 tracking-wider">
-                    a quiet little corner for you
-                </span>
-            </div>
-
-            <!-- Main Content Container -->
-            <div class="w-full max-w-sm my-auto flex flex-col items-center space-y-6">
-                
-                <!-- Main Framing Polaroid Photo Container -->
-                <!-- EASY IMAGE REPLACEMENT: Change the src inside the <img> tag below -->
-                <div class="relative w-64 h-72 sm:w-72 sm:h-80 bg-white p-3 pb-10 rounded-lg shadow-sm border border-stone-200/80 transform rotate-[-1deg] transition-transform duration-500 hover:rotate-0">
-                    <!-- Washi Tape Accent -->
-                    <div class="washi-tape absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 z-20"></div>
-                    
-                    <div class="w-full h-full bg-cream-100 rounded overflow-hidden relative group border border-stone-100">
-                        <!-- REPLACE IMAGE HERE -->
-                        <img id="landingPhoto" 
-                             src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80" 
-                             alt="Us Together" 
-                             class="w-full h-full object-cover object-center filter saturate-[0.85] contrast-[0.95] transition-transform duration-700 hover:scale-105"
-                             onerror="this.onerror=null; this.src='https://placehold.co/600x700/F5EFEB/4A4441?text=Our+Photo';">
-                        
-                        <!-- Overlay Vignette -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-60"></div>
-                    </div>
-
-                    <!-- Polaroid Caption -->
-                    <div class="absolute bottom-2 left-0 right-0 text-center">
-                        <span class="font-caveat text-lg text-slateDark-700">Forever my favorite smile</span>
-                    </div>
-                </div>
-
-                <!-- Minimalist Touching Message -->
-                <div class="space-y-2 px-2">
-                    <h1 class="font-cormorant text-2xl sm:text-3xl text-slateDark-800 font-normal leading-snug">
-                        Hey... take a deep breath.
-                    </h1>
-                    <p class="text-xs sm:text-sm text-slateDark-500 leading-relaxed font-light">
-                        I know things have felt heavy lately. I built this peaceful corner just for you to relax, pause, and remember how loved you are.
-                    </p>
-                </div>
-
-                <!-- Clean Touch Button -->
-                <div class="w-full pt-2">
-                    <button id="openScrapbookBtn" 
-                            class="touch-btn min-h-[48px] w-full max-w-xs mx-auto py-3 px-6 rounded-full bg-white/80 border border-stone-300 text-slateDark-800 text-sm font-medium tracking-wide shadow-sm backdrop-blur-md hover:border-slateDark-700 active:bg-cream-200 flex items-center justify-center space-x-2">
-                        <i class="fas fa-book-open text-dustyRose-400 text-xs"></i>
-                        <span>Open Our Scrapbook</span>
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- Footer Hint -->
-            <div class="pb-2">
-                <p class="font-caveat text-xs text-stone-400">crafted with all my love ❤️</p>
-            </div>
-
-        </main>
-
-
-        <!-- ============================================================ -->
-        <!-- PAGE 2: MOBILE-FIRST DIGITAL SCRAPBOOK                       -->
-        <!-- ============================================================ -->
-        <section id="page2" class="hidden min-h-screen w-full flex flex-col scrapbook-paper">
-            
-            <!-- Sticky Mobile Header Bar -->
-            <header class="sticky top-0 z-30 w-full bg-cream-50/90 backdrop-blur-md border-b border-stone-200/70 px-4 py-3 safe-pt flex items-center justify-between">
-                <button id="backToLandingBtn" class="touch-btn min-h-[44px] px-3 py-1.5 rounded-full border border-stone-200 bg-white/60 text-slateDark-700 text-xs flex items-center space-x-1.5">
-                    <i class="fas fa-arrow-left text-[10px]"></i>
-                    <span>Home</span>
-                </button>
-
-                <span class="font-caveat text-lg text-slateDark-800 font-semibold">Our Scrapbook</span>
-
-                <!-- Audio Toggle Chime Button -->
-                <button id="musicToggleBtn" class="touch-btn min-h-[44px] min-w-[44px] rounded-full border border-stone-200 bg-white/60 text-slateDark-700 text-xs flex items-center justify-center">
-                    <i id="musicIcon" class="fas fa-volume-mute text-slateDark-500"></i>
-                </button>
-            </header>
-
-            <!-- Scrollable Journal Content -->
-            <main class="w-full max-w-md mx-auto px-4 py-6 space-y-8 safe-pb">
-                
-                <!-- Section 1: Where It All Began -->
-                <section class="bg-white/90 p-5 rounded-2xl border border-stone-200/80 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-stone-100 pb-2">
-                        <span class="font-cormorant text-xl text-slateDark-800 font-medium">1. Where It All Began</span>
-                        <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-dustyRose-100 text-dustyRose-500 font-medium">Chapter I</span>
-                    </div>
-
-                    <div class="relative rounded-xl overflow-hidden border border-stone-200/60 bg-cream-100">
-                        <!-- REPLACE IMAGE HERE -->
-                        <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80" 
-                             alt="Where it started" 
-                             class="w-full h-48 object-cover object-center"
-                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/F5EFEB/4A4441?text=Memory+1';">
-                        <div class="absolute bottom-2 right-2 bg-black/50 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-light">
-                            Day One
-                        </div>
-                    </div>
-
-                    <p class="font-caveat text-xl text-slateDark-700 leading-snug">
-                        "From the very first moment we talked, something felt effortlessly right. You brought a soft warmth into my world that I never knew I was missing."
-                    </p>
-                </section>
-
-
-                <!-- Section 2: The Journey To You -->
-                <section class="bg-white/90 p-5 rounded-2xl border border-stone-200/80 shadow-sm space-y-4">
-                    <div class="flex items-center justify-between border-b border-stone-100 pb-2">
-                        <span class="font-cormorant text-xl text-slateDark-800 font-medium">2. The Journey To You</span>
-                        <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-softAmber-100 text-amber-700 font-medium">Miles & Smiles</span>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="p-3 bg-cream-50 rounded-xl border border-stone-100 flex items-start space-x-3">
-                            <div class="p-2 bg-dustyRose-100 rounded-lg text-dustyRose-500 shrink-0">
-                                <i class="fas fa-train text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-medium text-xs text-slateDark-800">The Long Train Ride</h4>
-                                <p class="text-xs text-slateDark-500 font-light mt-0.5">28 hours on the Purushottam Express just to see you—and every single minute was completely worth it.</p>
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-cream-50 rounded-xl border border-stone-100 flex items-start space-x-3">
-                            <div class="p-2 bg-softAmber-100 rounded-lg text-amber-600 shrink-0">
-                                <i class="fas fa-moon text-sm"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-medium text-xs text-slateDark-800">Late Night Whispers</h4>
-                                <p class="text-xs text-slateDark-500 font-light mt-0.5">Those 2 AM phone calls where we talked about everything and nothing until one of us fell asleep.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-
-                <!-- Section 3: Tap-to-Flip Memory Cards -->
-                <section class="space-y-3">
-                    <div class="text-center">
-                        <h3 class="font-cormorant text-2xl text-slateDark-800 font-medium">3. Secret Memory Cards</h3>
-                        <p class="text-xs text-slateDark-500">Tap any card to flip it over</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-4">
-                        
-                        <!-- Flip Card 1 -->
-                        <div class="perspective-1000 h-44 cursor-pointer" onclick="flipCard(this)">
-                            <div class="card-inner relative w-full h-full transform-style-3d shadow-sm hover:shadow transition-all duration-500">
-                                <!-- Front -->
-                                <div class="absolute inset-0 bg-white p-4 rounded-xl border border-stone-200 flex flex-col justify-between backface-hidden">
-                                    <div class="washi-tape absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-4"></div>
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-heart text-dustyRose-400 text-xs"></i>
-                                        <span class="text-xs font-medium text-slateDark-500">Secret #1</span>
-                                    </div>
-                                    <div class="text-center my-auto">
-                                        <p class="font-caveat text-2xl text-slateDark-800">What I notice when you laugh</p>
-                                    </div>
-                                    <span class="text-[10px] text-stone-400 text-right">Tap to reveal ↩</span>
-                                </div>
-                                <!-- Back -->
-                                <div class="absolute inset-0 bg-dustyRose-100 p-5 rounded-xl border border-dustyRose-200 flex flex-col justify-center items-center text-center backface-hidden rotate-y-180">
-                                    <p class="font-caveat text-xl text-slateDark-800">
-                                        "How your eyes crinkle up at the corners. It's literally my favorite sight in the world."
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Flip Card 2 -->
-                        <div class="perspective-1000 h-44 cursor-pointer" onclick="flipCard(this)">
-                            <div class="card-inner relative w-full h-full transform-style-3d shadow-sm hover:shadow transition-all duration-500">
-                                <!-- Front -->
-                                <div class="absolute inset-0 bg-white p-4 rounded-xl border border-stone-200 flex flex-col justify-between backface-hidden">
-                                    <div class="washi-tape absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-4"></div>
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fas fa-star text-softAmber-400 text-xs"></i>
-                                        <span class="text-xs font-medium text-slateDark-500">Secret #2</span>
-                                    </div>
-                                    <div class="text-center my-auto">
-                                        <p class="font-caveat text-2xl text-slateDark-800">My quiet promise to you</p>
-                                    </div>
-                                    <span class="text-[10px] text-stone-400 text-right">Tap to reveal ↩</span>
-                                </div>
-                                <!-- Back -->
-                                <div class="absolute inset-0 bg-softAmber-100 p-5 rounded-xl border border-amber-200 flex flex-col justify-center items-center text-center backface-hidden rotate-y-180">
-                                    <p class="font-caveat text-xl text-slateDark-800">
-                                        "No matter how cloudy things get, I am never giving up on us. I am right here."
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-
-                <!-- Section 4: "Open When..." Letters -->
-                <section class="bg-white/90 p-5 rounded-2xl border border-stone-200/80 shadow-sm space-y-4">
-                    <div class="border-b border-stone-100 pb-2">
-                        <h3 class="font-cormorant text-2xl text-slateDark-800 font-medium">4. Open When...</h3>
-                        <p class="text-xs text-slateDark-500">Tap an accordion to open a letter whenever you need it</p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <!-- Accordion Item 1 -->
-                        <div class="border border-stone-200 rounded-xl overflow-hidden bg-cream-50/50">
-                            <button onclick="toggleAccordion(this)" class="w-full p-3 text-left text-xs font-medium text-slateDark-800 flex items-center justify-between touch-btn">
-                                <span class="flex items-center space-x-2">
-                                    <i class="fas fa-cloud-rain text-dustyRose-400"></i>
-                                    <span>Open when you feel overwhelmed...</span>
-                                </span>
-                                <i class="fas fa-chevron-down text-[10px] text-stone-400 transition-transform duration-300"></i>
-                            </button>
-                            <div class="accordion-content px-4 text-xs text-slateDark-700 leading-relaxed font-light">
-                                <div class="py-3 border-t border-stone-200/50">
-                                    Close your eyes for ten seconds. Take a deep breath in, and exhale slowly. You don't have to figure everything out today. I am on your team, always.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Accordion Item 2 -->
-                        <div class="border border-stone-200 rounded-xl overflow-hidden bg-cream-50/50">
-                            <button onclick="toggleAccordion(this)" class="w-full p-3 text-left text-xs font-medium text-slateDark-800 flex items-center justify-between touch-btn">
-                                <span class="flex items-center space-x-2">
-                                    <i class="fas fa-heart-broken text-dustyRose-400"></i>
-                                    <span>Open when you doubt us...</span>
-                                </span>
-                                <i class="fas fa-chevron-down text-[10px] text-stone-400 transition-transform duration-300"></i>
-                            </button>
-                            <div class="accordion-content px-4 text-xs text-slateDark-700 leading-relaxed font-light">
-                                <div class="py-3 border-t border-stone-200/50">
-                                    Rough patches are just tiny chapters in a long, beautiful book. My love for you isn't fragile—it's steady, constant, and here to stay.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Accordion Item 3 -->
-                        <div class="border border-stone-200 rounded-xl overflow-hidden bg-cream-50/50">
-                            <button onclick="toggleAccordion(this)" class="w-full p-3 text-left text-xs font-medium text-slateDark-800 flex items-center justify-between touch-btn">
-                                <span class="flex items-center space-x-2">
-                                    <i class="fas fa-hand-holding-heart text-amber-500"></i>
-                                    <span>Open when you need a hug...</span>
-                                </span>
-                                <i class="fas fa-chevron-down text-[10px] text-stone-400 transition-transform duration-300"></i>
-                            </button>
-                            <div class="accordion-content px-4 text-xs text-slateDark-700 leading-relaxed font-light">
-                                <div class="py-3 border-t border-stone-200/50">
-                                    Consider this a digital coupon for 1 giant, warm, unhurried hug. Wrap your arms around yourself and feel me holding you tight.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-
-                <!-- Section 5: Redeemable Love Coupons -->
-                <section class="bg-white/90 p-5 rounded-2xl border border-stone-200/80 shadow-sm space-y-4">
-                    <div class="border-b border-stone-100 pb-2">
-                        <h3 class="font-cormorant text-2xl text-slateDark-800 font-medium">5. Love Coupons</h3>
-                        <p class="text-xs text-slateDark-500">Tap "Redeem" whenever you want to use one!</p>
-                    </div>
-
-                    <div class="space-y-3">
-                        <!-- Coupon 1 -->
-                        <div class="p-3 bg-cream-50 rounded-xl border border-dashed border-dustyRose-300 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-semibold text-slateDark-800">🎟️ Infinite Hugs Pass</span>
-                                <p class="text-[10px] text-slateDark-500">Valid anytime, no expiration date.</p>
-                            </div>
-                            <button onclick="redeemCoupon(this, 'Infinite Hugs Pass')" class="touch-btn text-xs px-3 py-1.5 rounded-full bg-dustyRose-400 text-white font-medium shadow-sm">
-                                Redeem
-                            </button>
-                        </div>
-
-                        <!-- Coupon 2 -->
-                        <div class="p-3 bg-cream-50 rounded-xl border border-dashed border-amber-300 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-semibold text-slateDark-800">🎟️ Win Any Argument</span>
-                                <p class="text-[10px] text-slateDark-500">Play this card to instantly win!</p>
-                            </div>
-                            <button onclick="redeemCoupon(this, 'Win Any Argument')" class="touch-btn text-xs px-3 py-1.5 rounded-full bg-amber-500 text-white font-medium shadow-sm">
-                                Redeem
-                            </button>
-                        </div>
-
-                        <!-- Coupon 3 -->
-                        <div class="p-3 bg-cream-50 rounded-xl border border-dashed border-stone-300 flex items-center justify-between">
-                            <div>
-                                <span class="text-xs font-semibold text-slateDark-800">🎟️ Favorite Dessert Delivery</span>
-                                <p class="text-[10px] text-slateDark-500">Your favorite treat delivered on me.</p>
-                            </div>
-                            <button onclick="redeemCoupon(this, 'Favorite Dessert Delivery')" class="touch-btn text-xs px-3 py-1.5 rounded-full bg-slateDark-700 text-white font-medium shadow-sm">
-                                Redeem
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-
-                <!-- Section 6: Typewriter Love Letter -->
-                <section class="bg-cream-100/90 p-6 rounded-2xl border border-stone-300/70 shadow-sm space-y-4">
-                    <div class="text-center">
-                        <span class="font-caveat text-xl text-dustyRose-500">A Personal Note</span>
-                        <h3 class="font-cormorant text-2xl text-slateDark-800 font-normal">To My Favorite Person</h3>
-                    </div>
-
-                    <div id="typewriterBox" class="min-h-[160px] text-xs sm:text-sm text-slateDark-700 leading-relaxed font-light font-sans space-y-2">
-                        <!-- Letter JS Animation -->
-                    </div>
-
-                    <div class="text-right pt-2">
-                        <span class="font-caveat text-xl text-slateDark-800">— Yours always</span>
-                    </div>
-                </section>
-
-                <div class="text-center pt-4 pb-8">
-                    <p class="font-cormorant italic text-sm text-slateDark-500">"I love you more than words on a screen can ever express."</p>
-                </div>
-
-            </main>
-        </section>
-
-    </div>
-
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // --- 1. Ambient Floating Hearts & Doodles Canvas ---
-        const canvas = document.getElementById('doodleCanvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        class FloatingParticle {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = Math.random() * width;
-                this.y = height + 15;
-                this.size = Math.random() * 7 + 5;
-                this.speedY = Math.random() * 0.35 + 0.12;
-                this.opacity = Math.random() * 0.22 + 0.08;
-                this.type = Math.floor(Math.random() * 3); // 0: heart, 1: star, 2: dot
-            }
-            update() {
-                this.y -= this.speedY;
-                this.x += Math.sin(this.y * 0.008) * 0.2;
-                if (this.y < -15) this.reset();
-            }
-            draw() {
-                ctx.fillStyle = `rgba(217, 152, 152, ${this.opacity})`;
-                ctx.strokeStyle = `rgba(217, 152, 152, ${this.opacity})`;
-
-                if (this.type === 0) {
-                    // Soft Heart
-                    ctx.beginPath();
-                    const topCurveHeight = this.size * 0.3;
-                    ctx.moveTo(this.x, this.y + topCurveHeight);
-                    ctx.bezierCurveTo(this.x, this.y, this.x - this.size / 2, this.y, this.x - this.size / 2, this.y + topCurveHeight);
-                    ctx.bezierCurveTo(this.x - this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x, this.y + this.size, this.x, this.y + this.size);
-                    ctx.bezierCurveTo(this.x, this.y + this.size, this.x + this.size / 2, this.y + (this.size + topCurveHeight) / 2, this.x + this.size / 2, this.y + topCurveHeight);
-                    ctx.bezierCurveTo(this.x + this.size / 2, this.y, this.x, this.y, this.x, this.y + topCurveHeight);
-                    ctx.fill();
-                } else if (this.type === 1) {
-                    // Soft Tiny Star
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size / 4, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    // Ring
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size / 3, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-            }
-        }
-
-        const particles = Array.from({ length: 18 }, () => new FloatingParticle());
-
-        function animateDoodles() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animateDoodles);
-        }
-        animateDoodles();
-
-
-        // --- 2. Page Navigation & Mobile Transition ---
-        const page1 = document.getElementById('page1');
-        const page2 = document.getElementById('page2');
-        const openBtn = document.getElementById('openScrapbookBtn');
-        const backBtn = document.getElementById('backToLandingBtn');
-
-        openBtn.addEventListener('click', () => {
-            // Heart confetti burst
-            confetti({
-                particleCount: 30,
-                spread: 60,
-                origin: { y: 0.7 },
-                colors: ['#D99898', '#F2D6D6', '#E2B858']
-            });
-
-            page1.classList.add('page-fade-out');
-            setTimeout(() => {
-                page1.classList.add('hidden');
-                page1.classList.remove('page-fade-out');
-                page2.classList.remove('hidden');
-                page2.classList.add('page-fade-in');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                startTypewriter();
-            }, 450);
-        });
-
-        backBtn.addEventListener('click', () => {
-            page2.classList.add('hidden');
-            page2.classList.remove('page-fade-in');
-            page1.classList.remove('hidden');
-            page1.classList.add('page-fade-in');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-
-        // --- 3. Interactive Mechanics (Flip Cards & Accordions) ---
-        function flipCard(cardContainer) {
-            const inner = cardContainer.querySelector('.card-inner');
-            inner.classList.toggle('rotate-y-180');
-        }
-
-        function toggleAccordion(button) {
-            const content = button.nextElementSibling;
-            const icon = button.querySelector('.fa-chevron-down');
-            
-            const isOpen = content.classList.contains('open');
-            
-            // Close all open accordions first for clean mobile feel
-            document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('open'));
-            document.querySelectorAll('.fa-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
-
-            if (!isOpen) {
-                content.classList.add('open');
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-        }
-
-        function redeemCoupon(btn, title) {
-            confetti({
-                particleCount: 20,
-                spread: 40,
-                origin: { y: 0.8 },
-                colors: ['#D99898', '#E2B858']
-            });
-            btn.textContent = "Redeemed! ❤️";
-            btn.classList.remove('bg-dustyRose-400', 'bg-amber-500', 'bg-slateDark-700');
-            btn.classList.add('bg-stone-300', 'text-stone-600', 'cursor-default');
-            btn.disabled = true;
-        }
-
-
-        // --- 4. Web Audio Synthetic Relaxation Chime ---
-        let audioCtx = null;
-        let isPlaying = false;
-        let chimeInterval = null;
-        const musicBtn = document.getElementById('musicToggleBtn');
-        const musicIcon = document.getElementById('musicIcon');
-
-        function playSoftChime() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            const notes = [261.63, 329.63, 392.00, 523.25, 659.25]; // C major pentatonic soft chime
-            const note = notes[Math.floor(Math.random() * notes.length)];
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(note, audioCtx.currentTime);
-
-            gain.gain.setValueAtTime(0, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 2.6);
-        }
-
-        musicBtn.addEventListener('click', () => {
-            if (!isPlaying) {
-                isPlaying = true;
-                musicIcon.className = "fas fa-volume-up text-dustyRose-500";
-                playSoftChime();
-                chimeInterval = setInterval(playSoftChime, 3200);
-            } else {
-                isPlaying = false;
-                musicIcon.className = "fas fa-volume-mute text-slateDark-500";
-                clearInterval(chimeInterval);
-            }
-        });
-
-
-        // --- 5. Typewriter Letter Animation ---
-        const letterText = "I built this page because I wanted to create a peaceful space where you could always come when things feel loud. No matter how hard things get, my love for you is steady, patient, and unchanging. Thank you for being my favorite part of every day.";
-        let hasTyped = false;
-
-        function startTypewriter() {
-            if (hasTyped) return;
-            hasTyped = true;
-
-            const box = document.getElementById('typewriterBox');
-            box.innerHTML = '<span class="typewriter-cursor"></span>';
-            const cursor = box.querySelector('.typewriter-cursor');
-
-            let index = 0;
-            function typeChar() {
-                if (index < letterText.length) {
-                    cursor.before(letterText.charAt(index));
-                    index++;
-                    setTimeout(typeChar, 35);
-                } else {
-                    cursor.remove();
-                }
-            }
-            setTimeout(typeChar, 400);
-        }
-    </script>
-</body>
-</html>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>A Quiet Little Corner For Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #fbf5f6;
+      --card-bg: #ffffff;
+      --text-main: #4a3e3f;
+      --text-muted: #8c7a7c;
+      --accent-soft: #f4dada;
+      --accent-pink: #e8b4b8;
+      --accent-hover: #d8969b;
+      --border-color: #eedede;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-handwritten: 'Caveat', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    }
+
+    html {
+      height: -webkit-fill-available;
+    }
+
+    /* Floating Aesthetic Background Doodles */
+    .bg-doodles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .doodle {
+      position: absolute;
+      color: var(--accent-pink);
+      opacity: 0.35;
+      animation: float 14s infinite ease-in-out;
+      user-select: none;
+    }
+
+    /* Varied position, size, and animation delays for floating elements */
+    .doodle-1 { top: 8%; left: 12%; font-size: 22px; animation-duration: 12s; animation-delay: 0s; }
+    .doodle-2 { top: 15%; right: 14%; font-size: 16px; animation-duration: 16s; animation-delay: -2s; }
+    .doodle-3 { top: 42%; left: 8%; font-size: 18px; animation-duration: 15s; animation-delay: -5s; }
+    .doodle-4 { top: 68%; right: 10%; font-size: 24px; animation-duration: 13s; animation-delay: -3s; }
+    .doodle-5 { bottom: 12%; left: 15%; font-size: 20px; animation-duration: 17s; animation-delay: -7s; }
+    .doodle-6 { bottom: 18%; right: 18%; font-size: 15px; animation-duration: 11s; animation-delay: -4s; }
+    .doodle-7 { top: 28%; right: 28%; font-size: 14px; animation-duration: 18s; animation-delay: -1s; }
+    .doodle-8 { bottom: 35%; left: 22%; font-size: 19px; animation-duration: 14s; animation-delay: -6s; }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg) scale(1);
+      }
+      50% {
+        transform: translateY(-18px) rotate(8deg) scale(1.05);
+      }
+    }
+
+    /* Subtle ambient glowing orbs */
+    .glow-orb {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232, 180, 184, 0.25) 0%, rgba(251, 245, 246, 0) 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .orb-1 { top: -40px; left: -40px; }
+    .orb-2 { bottom: -60px; right: -60px; }
+
+    /* Main Container Card */
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 24px 20px;
+      animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Photo Frame Component */
+    .photo-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 250px;
+      aspect-ratio: 4/5;
+      margin-bottom: 28px;
+      padding: 10px 10px 32px 10px;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px -5px rgba(140, 122, 124, 0.12),
+                  0 4px 12px -2px rgba(140, 122, 124, 0.06);
+      border: 1px solid var(--border-color);
+      transform: rotate(-1.5deg);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .photo-wrapper:hover, .photo-wrapper:active {
+      transform: rotate(0deg) scale(1.01);
+      box-shadow: 0 14px 36px -4px rgba(140, 122, 124, 0.16);
+    }
+
+    .photo-frame {
+      width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #f3e9ea;
+      position: relative;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .tape-doodle {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 22px;
+      background-color: rgba(255, 255, 255, 0.75);
+      border: 1px dashed var(--accent-pink);
+      backdrop-filter: blur(2px);
+      z-index: 3;
+      border-radius: 2px;
+    }
+
+    /* Typography */
+    .title {
+      font-family: var(--font-handwritten);
+      font-size: 2.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
