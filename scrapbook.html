@@ -1,1 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Our Digital Scrapbook</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Interact.js for Mobile Touch Dragging and Resizing -->
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+
+  <!-- Firebase Modular SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // --- YOUR FIREBASE CONFIGURATION ---
+    // Replace these placeholder values with your Firebase project config settings:
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    window.scrapbookDB = { database, ref, onValue, set };
+  </script>
+
+  <style>
+    :root {
+      --bg-color: #f7e8ea;
+      --card-bg: #ffffff;
+      --text-main: #2b2526;
+      --text-muted: #7e6f71;
+      --accent-pink: #e29ca3;
+      --border-color: #ebd3d6;
+      --line-blue: #c4dbe0;
+      --margin-pink: #f2b3b8;
+      --font-body: 'Inter', sans-serif;
+      --font-hand: 'Caveat', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    }
+
+    /* Top Control Bar */
+    .top-bar {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px 16px 4px;
+      z-index: 10;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sync-badge {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    /* Main Notebook Canvas */
+    .notebook-wrapper {
+      width: 100%;
+      max-width: 440px;
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .notebook-page {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background-color: var(--card-bg);
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(180, 130, 135, 0.2);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      /* Lined Paper Pattern */
+      background-image: 
+        linear-gradient(to right, transparent 36px, var(--margin-pink) 36px, var(--margin-pink) 38px, transparent 38px),
+        linear-gradient(to bottom, transparent 27px, var(--line-blue) 28px);
+      background-size: 100% 28px;
+    }
+
+    /* Page Content Layer */
+    .page-canvas {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding-left: 44px;
+      padding-right: 12px;
+      padding-top: 28px;
+    }
+
+    /* Editable Text Notes */
+    .notebook-text {
+      width: 100%;
+      height: calc(100% - 20px);
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--font-hand);
+      font-size: 1.55rem;
+      line-height: 28px;
+      color: #2c2829;
+      resize: none;
+      white-space: pre-wrap;
+    }
+
+    /* Draggable/Resizable Photos */
+    .scrapbook-photo {
+      position: absolute;
+      top: 40px;
+      left: 60px;
+      width: 130px;
+      background: #ffffff;
+      padding: 6px 6px 20px 6px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      border: 1px solid #eaeaea;
+      touch-action: none;
+      user-select: none;
+      z-index: 5;
+    }
+
+    .scrapbook-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Audio Bar Widget */
+    .audio-widget {
+      position: absolute;
+      bottom: 12px;
+      left: 44px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 6;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .audio-widget input {
+      flex-grow: 1;
+      border: none;
+      background: transparent;
+      font-size: 0.75rem;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    /* Bottom Toolbar & Navigation */
+    .bottom-controls {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px 0 8px 0;
+    }
+
+    .tool-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-tool {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-tool:active {
+      transform: scale(0.97);
+      background-color: #f7eded;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-nav {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      width: 42px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    .page-indicator {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="index.html" class="back-link">← Corner</a>
+    <div class="sync-badge" id="syncStatus">☁️ Synced</div>
+  </div>
+
+  <!-- Notebook View -->
+  <div class="notebook-wrapper">
+    <div class="notebook-page">
+      <div class="page-canvas" id="pageCanvas">
+        <!-- Text Area -->
+        <textarea class="notebook-text" id="pageText" placeholder="Write something sweet here..."></textarea>
+        
+        <!-- Audio Widget -->
+        <div class="audio-widget">
+          <span>🎵</span>
+          <input type="text" id="audioUrl" placeholder="Paste song audio URL...">
+          <button class="btn-tool" style="padding: 2px 8px;" id="btnPlayAudio">Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Controls & Page Navigation -->
+  <div class="bottom-controls">
+    <div class="tool-buttons">
+      <label class="btn-tool">
+        📷 Add Photo
+        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+      </label>
+      <button class="btn-tool" id="btnSave">💾 Save Page</button>
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn-nav" id="btnPrev">‹</button>
+      <span class="page-indicator" id="pageNumber">Page 1 of 5</span>
+      <button class="btn-nav" id="btnNext">›</button>
+    </div>
+  </div>
+
+  <audio id="bgAudio" loop></audio>
+
+  <!-- Interactive Logic Script -->
+  <script>
+    let currentPage = 1;
+    const totalPages = 5;
+    let pageData = {};
+
+    const pageText = document.getElementById('pageText');
+    const audioUrl = document.getElementById('audioUrl');
+    const bgAudio = document.getElementById('bgAudio');
+    const pageNumber = document.getElementById('pageNumber');
+    const syncStatus = document.getElementById('syncStatus');
+
+    // Page Navigation
+    document.getElementById('btnPrev').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadPage(currentPage);
+      }
+    });
+
+    document.getElementById('btnNext').addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadPage(currentPage);
+      }
+    });
+
+    function updateNav() {
+      pageNumber.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    // Load Local Page Content
+    function loadPage(page) {
+      updateNav();
+      const data = pageData[page] || { text: '', audio: '', photos: [] };
+      pageText.value = data.text || '';
+      audioUrl.value = data.audio || '';
+      
+      // Clean up previous photos
+      document.querySelectorAll('.scrapbook-photo').forEach(el => el.remove());
+
+      // Render photos
+      if (data.photos) {
+        data.photos.forEach(p => createPhotoElement(p.src, p.x, p.y, p.w));
+      }
+    }
+
+    // Add Photo Element
+    function createPhotoElement(src, x = 60, y = 40, w = 130) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'scrapbook-photo';
+      wrapper.style.transform = `translate(${x}px, ${y}px)`;
+      wrapper.style.width = `${w}px`;
+      wrapper.setAttribute('data-x', x);
+      wrapper.setAttribute('data-y', y);
+
+      const img = document.createElement('img');
+      img.src = src;
+      wrapper.appendChild(img);
+
+      document.getElementById('pageCanvas').appendChild(wrapper);
+      makeInteractive(wrapper);
+    }
+
+    // Make Photos Draggable and Resizable via Touch
+    function makeInteractive(element) {
+      interact(element)
+        .draggable({
+          listeners: {
+            move(event) {
+              const target = event.target;
+              const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+              const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+              target.style.transform = `translate(${x}px, ${y}px)`;
+              target.setAttribute('data-x', x);
+              target.setAttribute('data-y', y);
+            }
+          }
+        })
+        .resizable({
+          edges: { left: true, right: true, bottom: true, top: true },
+          listeners: {
+            move(event) {
+              let { x, y } = event.target.dataset;
+              x = (parseFloat(x) || 0) + event.deltaRect.left;
+              y = (parseFloat(y) || 0) + event.deltaRect.top;
+              Object.assign(event.target.style, {
+                width: `${event.rect.width}px`,
+                transform: `translate(${x}px, ${y}px)`
+              });
+              Object.assign(event.target.dataset, { x, y });
+            }
+          }
+        });
+    }
+
+    // Handle Photo Upload
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          createPhotoElement(evt.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle Audio Playback
+    document.getElementById('btnPlayAudio').addEventListener('click', () => {
+      if (audioUrl.value) {
+        bgAudio.src = audioUrl.value;
+        bgAudio.play();
+      }
+    });
+
+    // Save Page Data locally or to Firebase
+    document.getElementById('btnSave').addEventListener('click', () => {
+      const photos = [];
+      document.querySelectorAll('.scrapbook-photo').forEach(el => {
+        photos.push({
+          src: el.querySelector('img').src,
+          x: parseFloat(el.getAttribute('data-x')) || 0,
+          y: parseFloat(el.getAttribute('data-y')) || 0,
+          w: parseFloat(el.style.width) || 130
+        });
+      });
+
+      const currentData = {
+        text: pageText.value,
+        audio: audioUrl.value,
+        photos: photos
+      };
+
+      pageData[currentPage] = currentData;
+
+      // Sync with Firebase if available
+      if (window.scrapbookDB) {
+        const { database, ref, set } = window.scrapbookDB;
+        set(ref(database, 'scrapbook/page_' + currentPage), currentData)
+          .then(() => {
+            syncStatus.textContent = "☁️ Saved & Synced";
+          });
+      }
+    });
+
+    // Firebase Listener for Real-Time Syncing
+    window.addEventListener('load', () => {
+      let checkInterval = setInterval(() => {
+        if (window.scrapbookDB) {
+          clearInterval(checkInterval);
+          const { database, ref, onValue } = window.scrapbookDB;
+          
+          onValue(ref(database, 'scrapbook'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              for (let p = 1; p <= totalPages; p++) {
+                if (data['page_' + p]) {
+                  pageData[p] = data['page_' + p];
+                }
+              }
+              loadPage(currentPage);
+            }
+          });
+        }
+      }, 300);
+    });
+
+    // Initial Load
+    loadPage(1);
+  </script>
+</body>
+</html>
