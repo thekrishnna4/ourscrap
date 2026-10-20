@@ -28,6 +28,7 @@
   appId: "1:657531881443:web:6a561ab17133f04b6002d6",
   measurementId: "G-N8R7GS2NCG"
 };
+
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     window.scrapbookDB = { database, ref, onValue, set };
@@ -122,6 +123,13 @@
       border: 1px solid var(--border-color);
       position: relative;
       overflow: hidden;
+
+      /* Full Page Lined Paper Pattern */
+      background-image: 
+        linear-gradient(to right, transparent 36px, var(--margin-pink) 36px, var(--margin-pink) 38px, transparent 38px),
+        linear-gradient(to bottom, transparent 27px, var(--line-blue) 28px);
+      background-size: 100% 28px;
+      background-repeat: repeat;
     }
 
     /* Cover Sheet */
@@ -130,6 +138,10 @@
       height: 100%;
       display: none;
       background-color: var(--card-bg);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 10;
     }
 
     .cover-sheet.active {
@@ -143,16 +155,14 @@
       display: block;
     }
 
-    /* Lined Notebook Page */
+    /* Lined Notebook Sheet Overlay */
     .notebook-sheet {
       width: 100%;
       height: 100%;
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
       display: none;
-      background-image: 
-        linear-gradient(to right, transparent 36px, var(--margin-pink) 36px, var(--margin-pink) 38px, transparent 38px),
-        linear-gradient(to bottom, transparent 27px, var(--line-blue) 28px);
-      background-size: 100% 28px;
       padding-left: 44px;
       padding-right: 12px;
       padding-top: 28px;
@@ -169,7 +179,7 @@
       100% { opacity: 1; }
     }
 
-    /* Pure Textarea aligned cleanly with notebook lines */
+    /* Textarea overlay seamlessly matching lines without scrollbars */
     .notebook-text {
       width: 100%;
       height: 100%;
@@ -182,7 +192,12 @@
       color: #2c2829;
       resize: none;
       white-space: pre-wrap;
-      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;  /* IE and Edge */
+    }
+
+    .notebook-text::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
     }
 
     /* Photos */
@@ -238,7 +253,7 @@
       padding: 6px 0;
     }
 
-    /* Audio Bar - Placed neatly above toolbar buttons */
+    /* Audio Bar - Placed outside the book sheet */
     .audio-widget {
       width: 100%;
       height: 40px;
@@ -339,7 +354,7 @@
     <div class="sync-badge" id="syncStatus">☁️ Synced</div>
   </div>
 
-  <!-- Notebook View -->
+  <!-- Notebook View Container -->
   <div class="notebook-wrapper">
     <div class="book-page" id="bookPage">
       
