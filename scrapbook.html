@@ -44,14 +44,6 @@
       --border-color: #ebd3d6;
       --line-blue: #c4dbe0;
       --margin-pink: #f2b3b8;
-      
-      /* Palette from your image reference */
-      --palette-coral: #E85D4E;
-      --palette-amber: #F4A261;
-      --palette-yellow: #F4E285;
-      --palette-skyblue: #89B4C4;
-      --palette-slate: #2B4C6F;
-
       --font-body: 'Inter', sans-serif;
       --font-hand: 'Caveat', cursive;
     }
@@ -95,22 +87,24 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 6px 14px;
       border-radius: 20px;
       border: 1px solid var(--border-color);
+      backdrop-filter: blur(4px);
     }
 
     .sync-badge {
       font-size: 0.75rem;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.75);
       padding: 4px 10px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
       color: var(--text-muted);
+      backdrop-filter: blur(4px);
     }
 
-    /* Book Container with 3D Page Turn Perspective */
+    /* Book Container with Realistic 3D Book Spine Perspective */
     .notebook-wrapper {
       width: 100%;
       max-width: 420px;
@@ -119,79 +113,80 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      perspective: 1200px;
+      perspective: 1500px;
       margin: 10px 0;
     }
 
-    /* Book Page Base */
+    /* Book Base Frame */
     .book-page {
       width: 100%;
       aspect-ratio: 3/4;
       background-color: var(--card-bg);
       border-radius: 8px;
-      box-shadow: 0 12px 36px rgba(180, 130, 135, 0.25);
+      box-shadow: -6px 12px 28px rgba(0, 0, 0, 0.12), 0 16px 40px rgba(180, 130, 135, 0.25);
       border: 1px solid var(--border-color);
       position: relative;
       overflow: hidden;
+      transform-style: preserve-3d;
       transform-origin: left center;
-      transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1), opacity 0.4s ease;
+      transition: transform 0.65s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.65s ease;
     }
 
-    /* Page Turn Animation Class */
-    .page-turning {
-      transform: rotateY(-90deg) scale(0.95);
-      opacity: 0.2;
+    /* Realistic Page Flip Keyframe Animations */
+    .flip-next {
+      animation: flipNextAnim 0.65s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+    }
+
+    .flip-prev {
+      animation: flipPrevAnim 0.65s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+    }
+
+    @keyframes flipNextAnim {
+      0% {
+        transform: rotateY(0deg);
+        box-shadow: -6px 12px 28px rgba(0, 0, 0, 0.12);
+      }
+      50% {
+        box-shadow: -20px 20px 35px rgba(0, 0, 0, 0.22);
+      }
+      100% {
+        transform: rotateY(-180deg);
+        box-shadow: 6px 12px 28px rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    @keyframes flipPrevAnim {
+      0% {
+        transform: rotateY(-180deg);
+        box-shadow: 6px 12px 28px rgba(0, 0, 0, 0.12);
+      }
+      50% {
+        box-shadow: -20px 20px 35px rgba(0, 0, 0, 0.22);
+      }
+      100% {
+        transform: rotateY(0deg);
+        box-shadow: -6px 12px 28px rgba(0, 0, 0, 0.12);
+      }
     }
 
     /* --- COVER PAGE STYLES (Page 0) --- */
-    .cover-content {
+    .cover-sheet {
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #fcedef 0%, #f7d6db 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      text-align: center;
       position: relative;
+      display: none;
+      background-color: var(--card-bg);
     }
 
-    .cover-photo-wrapper {
-      width: 200px;
-      aspect-ratio: 1/1;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 4px solid #ffffff;
-      box-shadow: 0 8px 24px rgba(226, 156, 163, 0.3);
-      margin-bottom: 24px;
+    .cover-sheet.active {
+      display: block;
     }
 
-    .cover-photo-wrapper img {
+    .cover-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .cover-title {
-      font-family: var(--font-hand);
-      font-size: 2.4rem;
-      color: var(--text-main);
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 16px;
-    }
-
-    .color-dots {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
+      display: block;
     }
 
     /* --- LINED NOTEBOOK PAGE STYLES --- */
@@ -227,7 +222,7 @@
       white-space: pre-wrap;
     }
 
-    /* Draggable/Resizable Photos */
+    /* Draggable/Resizable Photos with Delete Option */
     .scrapbook-photo {
       position: absolute;
       top: 40px;
@@ -270,13 +265,13 @@
       z-index: 10;
     }
 
-    /* Audio Widget */
+    /* Audio Widget with Play/Pause Controls */
     .audio-widget {
       position: absolute;
       bottom: 12px;
       left: 44px;
       right: 12px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid var(--border-color);
       border-radius: 20px;
       padding: 6px 12px;
@@ -351,7 +346,25 @@
       cursor: pointer;
     }
 
-    .page-indicator {
+    .page-indicator-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-input {
+      width: 48px;
+      padding: 4px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .page-total {
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
@@ -360,9 +373,9 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
+  <!-- Top Bar with Link to Landing Page -->
   <div class="top-bar">
-    <a href="index.html" class="back-link">← Corner</a>
+    <a href="firstpage.html" class="back-link">← Corner</a>
     <div class="sync-badge" id="syncStatus">☁️ Synced</div>
   </div>
 
@@ -371,91 +384,12 @@
     <div class="book-page" id="bookPage">
       
       <!-- COVER PAGE (Page 0) -->
-      <div class="notebook-sheet active" id="sheet-0">
-        <div class="cover-content">
-          <div class="cover-photo-wrapper">
-            <img src="coverp.jpeg" alt="Cover Photo">
-          </div>
-          <h1 class="cover-title">Yeah it's Krishna & Sneha</h1>
-          <div class="color-dots">
-            <div class="dot" style="background: var(--palette-coral);"></div>
-            <div class="dot" style="background: var(--palette-amber);"></div>
-            <div class="dot" style="background: var(--palette-yellow);"></div>
-            <div class="dot" style="background: var(--palette-skyblue);"></div>
-            <div class="dot" style="background: var(--palette-slate);"></div>
-          </div>
-        </div>
+      <div class="cover-sheet active" id="sheet-0">
+        <img src="coverp.png" alt="Cover" class="cover-img">
       </div>
 
-      <!-- PAGE 1 -->
-      <div class="notebook-sheet" id="sheet-1">
-        <textarea class="notebook-text" placeholder="Write something sweet here..."></textarea>
-        <div class="audio-widget">
-          <span>🎵</span>
-          <span class="audio-filename">No audio attached</span>
-          <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
-            Upload
-            <input type="file" class="audioInput" accept="audio/*" style="display: none;">
-          </label>
-          <button class="btn-tool btnPlay" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
-        </div>
-      </div>
-
-      <!-- PAGE 2 -->
-      <div class="notebook-sheet" id="sheet-2">
-        <textarea class="notebook-text" placeholder="Our memories..."></textarea>
-        <div class="audio-widget">
-          <span>🎵</span>
-          <span class="audio-filename">No audio attached</span>
-          <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
-            Upload
-            <input type="file" class="audioInput" accept="audio/*" style="display: none;">
-          </label>
-          <button class="btn-tool btnPlay" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
-        </div>
-      </div>
-
-      <!-- PAGE 3 -->
-      <div class="notebook-sheet" id="sheet-3">
-        <textarea class="notebook-text" placeholder="Reasons I smile..."></textarea>
-        <div class="audio-widget">
-          <span>🎵</span>
-          <span class="audio-filename">No audio attached</span>
-          <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
-            Upload
-            <input type="file" class="audioInput" accept="audio/*" style="display: none;">
-          </label>
-          <button class="btn-tool btnPlay" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
-        </div>
-      </div>
-
-      <!-- PAGE 4 -->
-      <div class="notebook-sheet" id="sheet-4">
-        <textarea class="notebook-text" placeholder="Things we will do..."></textarea>
-        <div class="audio-widget">
-          <span>🎵</span>
-          <span class="audio-filename">No audio attached</span>
-          <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
-            Upload
-            <input type="file" class="audioInput" accept="audio/*" style="display: none;">
-          </label>
-          <button class="btn-tool btnPlay" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
-        </div>
-      </div>
-
-      <!-- PAGE 5 -->
-      <div class="notebook-sheet" id="sheet-5">
-        <textarea class="notebook-text" placeholder="Forever yours..."></textarea>
-        <div class="audio-widget">
-          <span>🎵</span>
-          <span class="audio-filename">No audio attached</span>
-          <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
-            Upload
-            <input type="file" class="audioInput" accept="audio/*" style="display: none;">
-          </label>
-          <button class="btn-tool btnPlay" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
-        </div>
-      </div>
+      <!-- DYNAMIC PAGES (1 to 100 generated dynamically in JS) -->
+      <div id="pagesContainer"></div>
 
     </div>
   </div>
@@ -472,7 +406,10 @@
 
     <div class="nav-bar">
       <button class="btn-nav" id="btnPrev">‹</button>
-      <span class="page-indicator" id="pageIndicator">Cover</span>
+      <div class="page-indicator-wrapper">
+        <input type="number" id="pageJumpInput" class="page-input" min="0" max="100" value="0">
+        <span class="page-total" id="pageTotalLabel">/ 100</span>
+      </div>
       <button class="btn-nav" id="btnNext">›</button>
     </div>
   </div>
@@ -482,61 +419,118 @@
   <!-- Script Logic -->
   <script>
     let currentPage = 0;
-    const totalPages = 5;
+    const totalPages = 100;
     let pageData = {};
     let activeAudioData = {};
-    let currentPlayingAudio = null;
+    let isPlaying = false;
 
     const bookPage = document.getElementById('bookPage');
-    const pageIndicator = document.getElementById('pageIndicator');
+    const pagesContainer = document.getElementById('pagesContainer');
+    const pageJumpInput = document.getElementById('pageJumpInput');
+    const pageTotalLabel = document.getElementById('pageTotalLabel');
     const toolBarContainer = document.getElementById('toolBarContainer');
     const syncStatus = document.getElementById('syncStatus');
+    const bgAudio = document.getElementById('bgAudio');
 
-    // Navigation Buttons with 3D Page Turn Animation
+    // Generate 100 Lined Notebook Pages Dynamically
+    function generatePages() {
+      for (let i = 1; i <= totalPages; i++) {
+        const sheet = document.createElement('div');
+        sheet.className = 'notebook-sheet';
+        sheet.id = `sheet-${i}`;
+        sheet.innerHTML = `
+          <textarea class="notebook-text" placeholder="Write page ${i} memories here..."></textarea>
+          <div class="audio-widget">
+            <span>🎵</span>
+            <span class="audio-filename">No audio attached</span>
+            <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
+              Upload
+              <input type="file" class="audioInput" data-page="${i}" accept="audio/*" style="display: none;">
+            </label>
+            <button class="btn-tool btnPlay" data-page="${i}" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
+          </div>
+        `;
+        pagesContainer.appendChild(sheet);
+      }
+      attachDynamicEvents();
+    }
+
+    generatePages();
+
+    // Stop audio whenever page turns or changes
+    function stopCurrentAudio() {
+      if (bgAudio) {
+        bgAudio.pause();
+        bgAudio.currentTime = 0;
+        isPlaying = false;
+        document.querySelectorAll('.btnPlay').forEach(btn => btn.textContent = 'Play');
+      }
+    }
+
+    // Navigation Buttons with Enhanced 3D Flip Animation
     document.getElementById('btnPrev').addEventListener('click', () => {
       if (currentPage > 0) {
-        turnPage(currentPage - 1);
+        turnPage(currentPage - 1, 'prev');
       }
     });
 
     document.getElementById('btnNext').addEventListener('click', () => {
       if (currentPage < totalPages) {
-        turnPage(currentPage + 1);
+        turnPage(currentPage + 1, 'next');
       }
     });
 
-    function turnPage(targetPage) {
-      // Trigger flip animation effect
-      bookPage.classList.add('page-turning');
+    // Jump directly to a page number typed in input
+    pageJumpInput.addEventListener('change', (e) => {
+      let val = parseInt(e.target.value);
+      if (isNaN(val)) val = 0;
+      if (val < 0) val = 0;
+      if (val > totalPages) val = totalPages;
+      if (val !== currentPage) {
+        turnPage(val, val > currentPage ? 'next' : 'prev');
+      }
+    });
+
+    function turnPage(targetPage, direction) {
+      stopCurrentAudio();
+
+      bookPage.classList.remove('flip-next', 'flip-prev');
+      void bookPage.offsetWidth; // Force reflow
+
+      bookPage.classList.add(direction === 'next' ? 'flip-next' : 'flip-prev');
 
       setTimeout(() => {
-        document.getElementById(`sheet-${currentPage}`).classList.remove('active');
+        document.querySelector('.active')?.classList.remove('active');
         currentPage = targetPage;
-        document.getElementById(`sheet-${currentPage}`).classList.add('active');
+        const targetSheet = document.getElementById(`sheet-${currentPage}`);
+        if (targetSheet) targetSheet.classList.add('active');
         
         updateUIState();
-
-        // Remove animation class
-        bookPage.classList.remove('page-turning');
       }, 300);
+
+      setTimeout(() => {
+        bookPage.classList.remove('flip-next', 'flip-prev');
+      }, 650);
     }
 
     function updateUIState() {
+      pageJumpInput.value = currentPage;
+
       if (currentPage === 0) {
-        pageIndicator.textContent = "Cover";
         toolBarContainer.style.display = "none";
       } else {
-        pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
         toolBarContainer.style.display = "flex";
+        loadPageContent(currentPage);
       }
-      loadPageContent(currentPage);
     }
 
-    // Load Data for Current Page
+    // Load Content for Current Page
     function loadPageContent(page) {
       if (page === 0) return;
 
       const sheet = document.getElementById(`sheet-${page}`);
+      if (!sheet) return;
+
       const textarea = sheet.querySelector('.notebook-text');
       const filenameSpan = sheet.querySelector('.audio-filename');
       const playBtn = sheet.querySelector('.btnPlay');
@@ -553,7 +547,7 @@
         playBtn.disabled = true;
       }
 
-      // Clear existing photos on sheet
+      // Clear previous photos
       sheet.querySelectorAll('.scrapbook-photo').forEach(el => el.remove());
 
       // Render photos
@@ -620,51 +614,63 @@
         });
     }
 
-    // Handle Photo Upload
-    document.getElementById('photoInput').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file && currentPage > 0) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const sheet = document.getElementById(`sheet-${currentPage}`);
-          createPhotoElement(sheet, evt.target.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Handle Audio File Upload
-    document.querySelectorAll('.audioInput').forEach((input, index) => {
-      const pageNum = index + 1;
-      input.addEventListener('change', (e) => {
+    // Attach File Upload & Audio Play/Pause Event Listeners
+    function attachDynamicEvents() {
+      // Photo Upload
+      document.getElementById('photoInput').addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if (file && currentPage > 0) {
           const reader = new FileReader();
           reader.onload = function(evt) {
-            activeAudioData[pageNum] = evt.target.result;
-            const sheet = document.getElementById(`sheet-${pageNum}`);
-            sheet.querySelector('.audio-filename').textContent = file.name;
-            sheet.querySelector('.btnPlay').disabled = false;
+            const sheet = document.getElementById(`sheet-${currentPage}`);
+            createPhotoElement(sheet, evt.target.result);
           };
           reader.readAsDataURL(file);
         }
       });
-    });
 
-    // Handle Audio Playback
-    document.querySelectorAll('.btnPlay').forEach((btn, index) => {
-      const pageNum = index + 1;
-      btn.addEventListener('click', () => {
-        if (activeAudioData[pageNum]) {
-          if (currentPlayingAudio) currentPlayingAudio.pause();
-          currentPlayingAudio = document.getElementById('bgAudio');
-          currentPlayingAudio.src = activeAudioData[pageNum];
-          currentPlayingAudio.play();
-          btn.textContent = "Playing...";
-          currentPlayingAudio.onended = () => { btn.textContent = "Play"; };
-        }
+      // Audio Upload Inputs
+      document.querySelectorAll('.audioInput').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const pageNum = input.getAttribute('data-page');
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+              activeAudioData[pageNum] = evt.target.result;
+              const sheet = document.getElementById(`sheet-${pageNum}`);
+              sheet.querySelector('.audio-filename').textContent = file.name;
+              sheet.querySelector('.btnPlay').disabled = false;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
       });
-    });
+
+      // Audio Play / Pause Toggle Buttons
+      document.querySelectorAll('.btnPlay').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pageNum = btn.getAttribute('data-page');
+
+          if (isPlaying) {
+            bgAudio.pause();
+            isPlaying = false;
+            btn.textContent = "Play";
+          } else {
+            if (activeAudioData[pageNum]) {
+              bgAudio.src = activeAudioData[pageNum];
+              bgAudio.play();
+              isPlaying = true;
+              btn.textContent = "Pause";
+              bgAudio.onended = () => {
+                btn.textContent = "Play";
+                isPlaying = false;
+              };
+            }
+          }
+        });
+      });
+    }
 
     // Save Page Data to Firebase
     document.getElementById('btnSave').addEventListener('click', () => {
