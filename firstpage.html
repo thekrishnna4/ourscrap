@@ -6,20 +6,17 @@
   <title>A Quiet Little Corner For Us</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --bg-color: #fbf5f6;
       --card-bg: #ffffff;
-      --text-main: #4a3e3f;
-      --text-muted: #8c7a7c;
-      --accent-soft: #f4dada;
-      --accent-pink: #e8b4b8;
-      --accent-hover: #d8969b;
-      --border-color: #eedede;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
-      --font-handwritten: 'Caveat', cursive;
+      --text-main: #3d3536;
+      --text-muted: #8a7b7d;
+      --accent-pink: #e2a8ad;
+      --border-color: #e8d8da;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     * {
@@ -32,7 +29,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      font-family: var(--font-body);
+      font-family: var(--font-main);
       min-height: 100vh;
       min-height: -webkit-fill-available;
       display: flex;
@@ -48,7 +45,7 @@
       height: -webkit-fill-available;
     }
 
-    /* Floating Aesthetic Background Doodles */
+    /* Floating Background Doodles Canvas Layer */
     .bg-doodles {
       position: absolute;
       top: 0;
@@ -63,87 +60,64 @@
     .doodle {
       position: absolute;
       color: var(--accent-pink);
-      opacity: 0.35;
-      animation: float 14s infinite ease-in-out;
+      opacity: 0.6;
+      animation: floatAnimation 10s infinite ease-in-out;
       user-select: none;
+      line-height: 1;
     }
 
-    /* Varied position, size, and animation delays for floating elements */
-    .doodle-1 { top: 8%; left: 12%; font-size: 22px; animation-duration: 12s; animation-delay: 0s; }
-    .doodle-2 { top: 15%; right: 14%; font-size: 16px; animation-duration: 16s; animation-delay: -2s; }
-    .doodle-3 { top: 42%; left: 8%; font-size: 18px; animation-duration: 15s; animation-delay: -5s; }
-    .doodle-4 { top: 68%; right: 10%; font-size: 24px; animation-duration: 13s; animation-delay: -3s; }
-    .doodle-5 { bottom: 12%; left: 15%; font-size: 20px; animation-duration: 17s; animation-delay: -7s; }
-    .doodle-6 { bottom: 18%; right: 18%; font-size: 15px; animation-duration: 11s; animation-delay: -4s; }
-    .doodle-7 { top: 28%; right: 28%; font-size: 14px; animation-duration: 18s; animation-delay: -1s; }
-    .doodle-8 { bottom: 35%; left: 22%; font-size: 19px; animation-duration: 14s; animation-delay: -6s; }
+    /* Positioning and Animation Speeds for Background Elements */
+    .d1 { top: 10%; left: 10%; font-size: 20px; animation-duration: 9s; }
+    .d2 { top: 18%; right: 12%; font-size: 16px; animation-duration: 12s; animation-delay: -2s; }
+    .d3 { top: 45%; left: 8%; font-size: 14px; animation-duration: 11s; animation-delay: -4s; }
+    .d4 { top: 65%; right: 10%; font-size: 22px; animation-duration: 10s; animation-delay: -1s; }
+    .d5 { bottom: 12%; left: 14%; font-size: 18px; animation-duration: 13s; animation-delay: -5s; }
+    .d6 { bottom: 20%; right: 16%; font-size: 15px; animation-duration: 8s; animation-delay: -3s; }
+    .d7 { top: 30%; right: 25%; font-size: 12px; animation-duration: 14s; animation-delay: -6s; }
+    .d8 { bottom: 38%; left: 20%; font-size: 17px; animation-duration: 10s; animation-delay: -2s; }
 
-    @keyframes float {
+    @keyframes floatAnimation {
       0%, 100% {
-        transform: translateY(0px) rotate(0deg) scale(1);
+        transform: translateY(0px) rotate(0deg);
       }
       50% {
-        transform: translateY(-18px) rotate(8deg) scale(1.05);
+        transform: translateY(-20px) rotate(10deg);
       }
     }
 
-    /* Subtle ambient glowing orbs */
-    .glow-orb {
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(232, 180, 184, 0.25) 0%, rgba(251, 245, 246, 0) 70%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .orb-1 { top: -40px; left: -40px; }
-    .orb-2 { bottom: -60px; right: -60px; }
-
-    /* Main Container Card */
+    /* Main Container */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 380px;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 24px 20px;
-      animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 20px;
     }
 
     /* Photo Frame Component */
     .photo-wrapper {
       position: relative;
       width: 100%;
-      max-width: 250px;
+      max-width: 240px;
       aspect-ratio: 4/5;
-      margin-bottom: 28px;
-      padding: 10px 10px 32px 10px;
+      margin-bottom: 32px;
+      padding: 10px 10px 28px 10px;
       background-color: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 10px 30px -5px rgba(140, 122, 124, 0.12),
-                  0 4px 12px -2px rgba(140, 122, 124, 0.06);
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(180, 150, 155, 0.12);
       border: 1px solid var(--border-color);
-      transform: rotate(-1.5deg);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-
-    .photo-wrapper:hover, .photo-wrapper:active {
-      transform: rotate(0deg) scale(1.01);
-      box-shadow: 0 14px 36px -4px rgba(140, 122, 124, 0.16);
     }
 
     .photo-frame {
       width: 100%;
       height: 100%;
-      border-radius: 6px;
+      border-radius: 2px;
       overflow: hidden;
-      background-color: #f3e9ea;
-      position: relative;
+      background-color: #f5ebed;
     }
 
     .photo-frame img {
@@ -153,138 +127,78 @@
       display: block;
     }
 
-    .tape-doodle {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 22px;
-      background-color: rgba(255, 255, 255, 0.75);
-      border: 1px dashed var(--accent-pink);
-      backdrop-filter: blur(2px);
-      z-index: 3;
-      border-radius: 2px;
-    }
-
-    /* Typography */
+    /* Minimalist Headline */
     .title {
-      font-family: var(--font-handwritten);
-      font-size: 2.1rem;
-      font-weight: 600;
+      font-family: var(--font-main);
+      font-size: 1.15rem;
+      font-weight: 400;
       color: var(--text-main);
-      margin-bottom: 24px;
-      letter-spacing: 0.5px;
-      line-height: 1.2;
+      margin-bottom: 28px;
+      letter-spacing: 0.2px;
     }
 
-    /* Minimalist Button */
+    /* Minimalist Rectangular Button */
     .btn-enter {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      padding: 14px 28px;
+      padding: 14px 32px;
       background-color: var(--card-bg);
       color: var(--text-main);
       border: 1px solid var(--border-color);
-      border-radius: 30px;
-      font-family: var(--font-body);
-      font-size: 0.92rem;
-      font-weight: 500;
-      letter-spacing: 0.3px;
+      border-radius: 4px;
+      font-family: var(--font-main);
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.5px;
       text-decoration: none;
-      box-shadow: 0 4px 14px rgba(232, 180, 184, 0.25);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      min-height: 48px;
-      width: auto;
-      min-width: 200px;
+      transition: all 0.25s ease;
+      width: 100%;
+      max-width: 220px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .btn-enter:hover {
-      background-color: #fff9fa;
+      background-color: #fffafb;
       border-color: var(--accent-pink);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(232, 180, 184, 0.35);
     }
 
     .btn-enter:active {
-      transform: translateY(0) scale(0.98);
-      box-shadow: 0 2px 8px rgba(232, 180, 184, 0.2);
-    }
-
-    .btn-heart-icon {
-      font-size: 1rem;
-      color: var(--accent-pink);
-      transition: transform 0.3s ease;
-    }
-
-    .btn-enter:hover .btn-heart-icon {
-      transform: scale(1.2);
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Small Screen Adjustments */
-    @media (max-height: 660px) {
-      .photo-wrapper {
-        max-width: 210px;
-        margin-bottom: 20px;
-      }
-      .title {
-        font-size: 1.8rem;
-        margin-bottom: 18px;
-      }
+      transform: scale(0.98);
+      background-color: #f7eded;
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Glow Backgrounds -->
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
-
-  <!-- Floating Aesthetic Background Doodles -->
+  <!-- Visible Floating Background Doodles -->
   <div class="bg-doodles">
-    <div class="doodle doodle-1">♡</div>
-    <div class="doodle doodle-2">✦</div>
-    <div class="doodle doodle-3">✧</div>
-    <div class="doodle doodle-4">☁</div>
-    <div class="doodle doodle-5">❀</div>
-    <div class="doodle doodle-6">♡</div>
-    <div class="doodle doodle-7">✦</div>
-    <div class="doodle doodle-8">✧</div>
+    <div class="doodle d1">♥</div>
+    <div class="doodle d2">✦</div>
+    <div class="doodle d3">✿</div>
+    <div class="doodle d4">♥</div>
+    <div class="doodle d5">✧</div>
+    <div class="doodle d6">✦</div>
+    <div class="doodle d7">♥</div>
+    <div class="doodle d8">✿</div>
   </div>
 
-  <!-- Main Content Container -->
+  <!-- Main Content Layer -->
   <main class="container">
     
-    <!-- Central Polaroid Photo -->
+    <!-- Photo Frame with fp.jpeg -->
     <div class="photo-wrapper">
-      <div class="tape-doodle"></div>
       <div class="photo-frame">
-        <!-- Replace 'photo.jpg' with your photo filename or URL -->
-        <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=800" alt="Us" id="landingPhoto">
+        <img src="fp.jpeg" alt="Us" id="landingPhoto">
       </div>
     </div>
 
-    <!-- Title Header -->
+    <!-- Minimalist Title -->
     <h1 class="title">a quiet little corner for us</h1>
 
-    <!-- Minimalist Button to Scrapbook Page -->
+    <!-- Minimalist Rectangular Button linking to scrapbook.html -->
     <a href="scrapbook.html" class="btn-enter">
-      <span>Open Our Scrapbook</span>
-      <span class="btn-heart-icon">♡</span>
+      Open Our Scrapbook
     </a>
 
   </main>
