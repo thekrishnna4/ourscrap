@@ -10,12 +10,12 @@
   
   <style>
     :root {
-      --bg-color: #fbf5f6;
+      --bg-color: #f7e8ea; /* Soft blush pink */
       --card-bg: #ffffff;
       --text-main: #3d3536;
       --text-muted: #8a7b7d;
-      --accent-pink: #e2a8ad;
-      --border-color: #e8d8da;
+      --accent-pink: #df949b;
+      --border-color: #e5c3c7;
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -45,7 +45,33 @@
       height: -webkit-fill-available;
     }
 
-    /* Floating Background Doodles Canvas Layer */
+    /* Ambient Soft Pink Glow Orbs */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(40px);
+      opacity: 0.6;
+    }
+
+    .orb-1 {
+      width: 280px;
+      height: 280px;
+      top: -60px;
+      left: -60px;
+      background: rgba(232, 160, 168, 0.45);
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      bottom: -80px;
+      right: -80px;
+      background: rgba(232, 160, 168, 0.45);
+    }
+
+    /* Floating Background Doodles Layer */
     .bg-doodles {
       position: absolute;
       top: 0;
@@ -60,28 +86,32 @@
     .doodle {
       position: absolute;
       color: var(--accent-pink);
-      opacity: 0.6;
-      animation: floatAnimation 10s infinite ease-in-out;
+      opacity: 0.7;
+      animation: floatAnimation 9s infinite ease-in-out;
       user-select: none;
       line-height: 1;
     }
 
-    /* Positioning and Animation Speeds for Background Elements */
-    .d1 { top: 10%; left: 10%; font-size: 20px; animation-duration: 9s; }
-    .d2 { top: 18%; right: 12%; font-size: 16px; animation-duration: 12s; animation-delay: -2s; }
-    .d3 { top: 45%; left: 8%; font-size: 14px; animation-duration: 11s; animation-delay: -4s; }
-    .d4 { top: 65%; right: 10%; font-size: 22px; animation-duration: 10s; animation-delay: -1s; }
-    .d5 { bottom: 12%; left: 14%; font-size: 18px; animation-duration: 13s; animation-delay: -5s; }
-    .d6 { bottom: 20%; right: 16%; font-size: 15px; animation-duration: 8s; animation-delay: -3s; }
-    .d7 { top: 30%; right: 25%; font-size: 12px; animation-duration: 14s; animation-delay: -6s; }
-    .d8 { bottom: 38%; left: 20%; font-size: 17px; animation-duration: 10s; animation-delay: -2s; }
+    /* Additional Doodles & Layout Coordinates */
+    .d1  { top: 8%;  left: 8%;   font-size: 22px; animation-duration: 8s;  animation-delay: 0s; }
+    .d2  { top: 14%; right: 10%; font-size: 18px; animation-duration: 11s; animation-delay: -2s; }
+    .d3  { top: 38%; left: 6%;   font-size: 16px; animation-duration: 10s; animation-delay: -4s; }
+    .d4  { top: 62%; right: 8%;  font-size: 24px; animation-duration: 9s;  animation-delay: -1s; }
+    .d5  { bottom: 10%; left: 12%; font-size: 20px; animation-duration: 12s; animation-delay: -5s; }
+    .d6  { bottom: 16%; right: 14%; font-size: 16px; animation-duration: 7s;  animation-delay: -3s; }
+    .d7  { top: 26%; right: 22%; font-size: 14px; animation-duration: 13s; animation-delay: -6s; }
+    .d8  { bottom: 32%; left: 18%;  font-size: 19px; animation-duration: 9s;  animation-delay: -2s; }
+    .d9  { top: 52%; left: 12%;  font-size: 15px; animation-duration: 10s; animation-delay: -3.5s; }
+    .d10 { top: 78%; right: 28%; font-size: 21px; animation-duration: 11s; animation-delay: -1.5s; }
+    .d11 { top: 5%;  right: 35%; font-size: 17px; animation-duration: 8.5s; animation-delay: -4.5s; }
+    .d12 { bottom: 6%; right: 45%; font-size: 18px; animation-duration: 12.5s; animation-delay: -0.5s; }
 
     @keyframes floatAnimation {
       0%, 100% {
-        transform: translateY(0px) rotate(0deg);
+        transform: translateY(0px) rotate(0deg) scale(1);
       }
       50% {
-        transform: translateY(-20px) rotate(10deg);
+        transform: translateY(-22px) rotate(12deg) scale(1.08);
       }
     }
 
@@ -98,7 +128,37 @@
       padding: 20px;
     }
 
-    /* Photo Frame Component */
+    /* Gentle Entrance Fade-Up Animations */
+    .fade-in-frame {
+      opacity: 0;
+      animation: entranceFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.2s;
+    }
+
+    .fade-in-title {
+      opacity: 0;
+      animation: entranceFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.6s;
+    }
+
+    .fade-in-btn {
+      opacity: 0;
+      animation: entranceFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.9s;
+    }
+
+    @keyframes entranceFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Gently Floating Frame Component */
     .photo-wrapper {
       position: relative;
       width: 100%;
@@ -108,8 +168,18 @@
       padding: 10px 10px 28px 10px;
       background-color: var(--card-bg);
       border-radius: 4px;
-      box-shadow: 0 8px 24px rgba(180, 150, 155, 0.12);
+      box-shadow: 0 10px 28px rgba(210, 150, 158, 0.25);
       border: 1px solid var(--border-color);
+      animation: floatFrame 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatFrame {
+      0% {
+        transform: translateY(0px) rotate(-0.5deg);
+      }
+      100% {
+        transform: translateY(-12px) rotate(0.8deg);
+      }
     }
 
     .photo-frame {
@@ -117,7 +187,7 @@
       height: 100%;
       border-radius: 2px;
       overflow: hidden;
-      background-color: #f5ebed;
+      background-color: #f7e2e5;
     }
 
     .photo-frame img {
@@ -155,23 +225,27 @@
       transition: all 0.25s ease;
       width: 100%;
       max-width: 220px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      box-shadow: 0 4px 12px rgba(210, 150, 158, 0.15);
     }
 
     .btn-enter:hover {
-      background-color: #fffafb;
+      background-color: #fff8f9;
       border-color: var(--accent-pink);
     }
 
     .btn-enter:active {
       transform: scale(0.98);
-      background-color: #f7eded;
+      background-color: #f3d8db;
     }
   </style>
 </head>
 <body>
 
-  <!-- Visible Floating Background Doodles -->
+  <!-- Ambient Pink Glow Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- Rich Floating Background Doodles -->
   <div class="bg-doodles">
     <div class="doodle d1">♥</div>
     <div class="doodle d2">✦</div>
@@ -181,25 +255,35 @@
     <div class="doodle d6">✦</div>
     <div class="doodle d7">♥</div>
     <div class="doodle d8">✿</div>
+    <div class="doodle d9">✧</div>
+    <div class="doodle d10">♥</div>
+    <div class="doodle d11">❀</div>
+    <div class="doodle d12">✦</div>
   </div>
 
   <!-- Main Content Layer -->
   <main class="container">
     
-    <!-- Photo Frame with fp.jpeg -->
-    <div class="photo-wrapper">
-      <div class="photo-frame">
-        <img src="fp.jpeg" alt="Us" id="landingPhoto">
+    <!-- Floating Frame Container with Page Load Animation -->
+    <div class="fade-in-frame">
+      <div class="photo-wrapper">
+        <div class="photo-frame">
+          <img src="fp.jpeg" alt="Us" id="landingPhoto">
+        </div>
       </div>
     </div>
 
-    <!-- Minimalist Title -->
-    <h1 class="title">a quiet little corner for us</h1>
+    <!-- Minimalist Title with Staggered Entrance -->
+    <div class="fade-in-title">
+      <h1 class="title">a quiet little corner for us</h1>
+    </div>
 
-    <!-- Minimalist Rectangular Button linking to scrapbook.html -->
-    <a href="scrapbook.html" class="btn-enter">
-      Open Our Scrapbook
-    </a>
+    <!-- Minimalist Rectangular Button with Staggered Entrance -->
+    <div class="fade-in-btn">
+      <a href="scrapbook.html" class="btn-enter">
+        Open Our Scrapbook
+      </a>
+    </div>
 
   </main>
 
