@@ -67,7 +67,7 @@
       padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     }
 
-    /* Top Control Bar */
+    /* Top Navigation Bar */
     .top-bar {
       width: 100%;
       max-width: 420px;
@@ -143,7 +143,7 @@
       display: block;
     }
 
-    /* Lined Notebook Page Layout */
+    /* Lined Notebook Page Flex Layout */
     .notebook-sheet {
       width: 100%;
       height: 100%;
@@ -163,18 +163,24 @@
 
     .notebook-sheet.active {
       display: flex;
-      animation: fadeInPage 0.25s ease-in-out;
+      animation: pageTurn 0.3s ease-out;
     }
 
-    @keyframes fadeInPage {
-      from { opacity: 0.4; }
-      to { opacity: 1; }
+    @keyframes pageTurn {
+      0% {
+        opacity: 0.3;
+        transform: translateX(16px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
-    /* Textarea fills top space without touching bottom bar */
+    /* Text Area - Strictly takes remaining vertical space */
     .notebook-text {
       width: 100%;
-      flex-grow: 1;
+      flex: 1 1 auto;
       background: transparent;
       border: none;
       outline: none;
@@ -183,14 +189,16 @@
       line-height: 28px;
       color: #2c2829;
       resize: none;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       white-space: pre-wrap;
+      overflow-y: auto;
     }
 
-    /* Audio Bar Pinned to Sheet Bottom */
+    /* Audio Bar - Fixed to bottom of sheet with flex-shrink */
     .audio-widget {
       width: 100%;
-      height: 38px;
+      height: 40px;
+      flex-shrink: 0;
       background: rgba(255, 255, 255, 0.96);
       border: 1px solid var(--border-color);
       border-radius: 20px;
@@ -200,7 +208,6 @@
       gap: 8px;
       z-index: 6;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      flex-shrink: 0;
     }
 
     .audio-filename {
@@ -337,7 +344,7 @@
 </head>
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- Top Navigation Bar linking back to firstpage.html -->
   <div class="top-bar">
     <a href="firstpage.html" class="back-link">← Corner</a>
     <div class="sync-badge" id="syncStatus">☁️ Synced</div>
