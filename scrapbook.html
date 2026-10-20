@@ -20,14 +20,14 @@
 
     // --- YOUR FIREBASE CONFIGURATION ---
     const firebaseConfig = {
-  apiKey: "AIzaSyA4sRJWhiHLrLuZbOjMu5mHlr9zvVmJb2s",
-  authDomain: "scrapbook-ba4cf.firebaseapp.com",
-  projectId: "scrapbook-ba4cf",
-  storageBucket: "scrapbook-ba4cf.firebasestorage.app",
-  messagingSenderId: "657531881443",
-  appId: "1:657531881443:web:6a561ab17133f04b6002d6",
-  measurementId: "G-N8R7GS2NCG"
-};
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
@@ -71,23 +71,23 @@
     /* Top Control Bar */
     .top-bar {
       width: 100%;
-      max-width: 440px;
+      max-width: 420px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 4px 12px 4px;
+      padding: 6px 4px 10px 4px;
       z-index: 10;
     }
 
     .back-link {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.85);
+      background: #ffffff;
       padding: 6px 14px;
       border-radius: 20px;
       border: 1px solid var(--border-color);
@@ -95,7 +95,7 @@
 
     .sync-badge {
       font-size: 0.75rem;
-      background: rgba(255, 255, 255, 0.85);
+      background: #ffffff;
       padding: 4px 10px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
@@ -111,41 +111,24 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      margin: 10px 0;
+      margin: 6px 0;
     }
 
     .book-page {
       width: 100%;
-      aspect-ratio: 3/4;
+      height: 520px;
       background-color: var(--card-bg);
       border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(180, 130, 135, 0.2);
+      box-shadow: 0 8px 28px rgba(180, 130, 135, 0.2);
       border: 1px solid var(--border-color);
       position: relative;
       overflow: hidden;
     }
 
-    /* Smooth Fade & Slide Page Transition */
-    .page-anim {
-      animation: pageTransition 0.35s ease-out forwards;
-    }
-
-    @keyframes pageTransition {
-      from {
-        opacity: 0.3;
-        transform: translateX(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    /* --- COVER PAGE (Page 0) --- */
+    /* Cover Sheet */
     .cover-sheet {
       width: 100%;
       height: 100%;
-      position: relative;
       display: none;
       background-color: var(--card-bg);
     }
@@ -161,12 +144,14 @@
       display: block;
     }
 
-    /* --- LINED NOTEBOOK PAGE STYLES --- */
+    /* Lined Notebook Page Layout */
     .notebook-sheet {
       width: 100%;
       height: 100%;
       position: relative;
       display: none;
+      flex-direction: column;
+      justify-content: space-between;
       background-image: 
         linear-gradient(to right, transparent 36px, var(--margin-pink) 36px, var(--margin-pink) 38px, transparent 38px),
         linear-gradient(to bottom, transparent 27px, var(--line-blue) 28px);
@@ -174,16 +159,23 @@
       padding-left: 44px;
       padding-right: 12px;
       padding-top: 28px;
+      padding-bottom: 12px;
     }
 
     .notebook-sheet.active {
-      display: block;
+      display: flex;
+      animation: fadeInPage 0.25s ease-in-out;
     }
 
-    /* Text Area - Cleanly Aligned with Lines */
+    @keyframes fadeInPage {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* Textarea fills top space without touching bottom bar */
     .notebook-text {
       width: 100%;
-      height: calc(100% - 70px);
+      flex-grow: 1;
       background: transparent;
       border: none;
       outline: none;
@@ -192,17 +184,43 @@
       line-height: 28px;
       color: #2c2829;
       resize: none;
+      margin-bottom: 8px;
       white-space: pre-wrap;
     }
 
-    /* Draggable/Resizable Photos */
+    /* Audio Bar Pinned to Sheet Bottom */
+    .audio-widget {
+      width: 100%;
+      height: 38px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 6;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .audio-filename {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Photos */
     .scrapbook-photo {
       position: absolute;
       top: 40px;
       left: 60px;
       width: 130px;
       background: #ffffff;
-      padding: 6px 6px 24px 6px;
+      padding: 6px 6px 22px 6px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
       border: 1px solid #eaeaea;
       touch-action: none;
@@ -238,40 +256,14 @@
       z-index: 10;
     }
 
-    /* Audio Bar Fixed to Bottom of Sheet */
-    .audio-widget {
-      position: absolute;
-      bottom: 12px;
-      left: 44px;
-      right: 12px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 6px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 6;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .audio-filename {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      flex-grow: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Bottom Toolbar & Navigation */
+    /* Bottom Controls */
     .bottom-controls {
       width: 100%;
       max-width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 8px 0;
+      gap: 8px;
+      padding: 6px 0;
     }
 
     .tool-buttons {
@@ -284,7 +276,7 @@
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 8px 14px;
+      padding: 7px 14px;
       font-size: 0.8rem;
       color: var(--text-main);
       cursor: pointer;
@@ -309,8 +301,8 @@
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      width: 46px;
-      height: 38px;
+      width: 44px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -346,28 +338,28 @@
 </head>
 <body>
 
-  <!-- Top Bar with Link to Landing Page -->
+  <!-- Top Navigation Bar -->
   <div class="top-bar">
     <a href="firstpage.html" class="back-link">← Corner</a>
     <div class="sync-badge" id="syncStatus">☁️ Synced</div>
   </div>
 
-  <!-- Notebook Container -->
+  <!-- Notebook View -->
   <div class="notebook-wrapper">
     <div class="book-page" id="bookPage">
       
-      <!-- COVER PAGE (Page 0) -->
+      <!-- Cover Page (Page 0) -->
       <div class="cover-sheet active" id="sheet-0">
         <img src="coverp.png" alt="Cover" class="cover-img">
       </div>
 
-      <!-- DYNAMIC PAGES (1 to 100 generated in JS) -->
+      <!-- 100 Dynamic Notebook Sheets -->
       <div id="pagesContainer"></div>
 
     </div>
   </div>
 
-  <!-- Bottom Controls & Page Navigation -->
+  <!-- Bottom Toolbar & Page Controls -->
   <div class="bottom-controls">
     <div class="tool-buttons" id="toolBarContainer" style="display: none;">
       <label class="btn-tool">
@@ -381,7 +373,7 @@
       <button class="btn-nav" id="btnPrev">‹</button>
       <div class="page-indicator-wrapper">
         <input type="number" id="pageJumpInput" class="page-input" min="0" max="100" value="0">
-        <span class="page-total" id="pageTotalLabel">/ 100</span>
+        <span class="page-total">/ 100</span>
       </div>
       <button class="btn-nav" id="btnNext">›</button>
     </div>
@@ -397,14 +389,13 @@
     let activeAudioData = {};
     let isPlaying = false;
 
-    const bookPage = document.getElementById('bookPage');
     const pagesContainer = document.getElementById('pagesContainer');
     const pageJumpInput = document.getElementById('pageJumpInput');
     const toolBarContainer = document.getElementById('toolBarContainer');
     const syncStatus = document.getElementById('syncStatus');
     const bgAudio = document.getElementById('bgAudio');
 
-    // Generate 100 Notebook Pages Dynamically
+    // Generate 100 Lined Sheets
     function generatePages() {
       for (let i = 1; i <= totalPages; i++) {
         const sheet = document.createElement('div');
@@ -415,11 +406,11 @@
           <div class="audio-widget">
             <span>🎵</span>
             <span class="audio-filename">No audio attached</span>
-            <label class="btn-tool" style="padding: 3px 8px; font-size: 0.7rem;">
+            <label class="btn-tool" style="padding: 2px 8px; font-size: 0.7rem;">
               Upload
               <input type="file" class="audioInput" data-page="${i}" accept="audio/*" style="display: none;">
             </label>
-            <button class="btn-tool btnPlay" data-page="${i}" style="padding: 3px 8px; font-size: 0.7rem;" disabled>Play</button>
+            <button class="btn-tool btnPlay" data-page="${i}" style="padding: 2px 8px; font-size: 0.7rem;" disabled>Play</button>
           </div>
         `;
         pagesContainer.appendChild(sheet);
@@ -429,7 +420,7 @@
 
     generatePages();
 
-    // Stop audio whenever page turns or changes
+    // Stop audio playback
     function stopCurrentAudio() {
       if (bgAudio) {
         bgAudio.pause();
@@ -439,39 +430,28 @@
       }
     }
 
-    // Navigation Controls with Clean Transition
+    // Page Switching
     document.getElementById('btnPrev').addEventListener('click', () => {
-      if (currentPage > 0) {
-        turnPage(currentPage - 1);
-      }
+      if (currentPage > 0) turnPage(currentPage - 1);
     });
 
     document.getElementById('btnNext').addEventListener('click', () => {
-      if (currentPage < totalPages) {
-        turnPage(currentPage + 1);
-      }
+      if (currentPage < totalPages) turnPage(currentPage + 1);
     });
 
-    // Jump directly to typed page number
     pageJumpInput.addEventListener('change', (e) => {
       let val = parseInt(e.target.value);
       if (isNaN(val)) val = 0;
       if (val < 0) val = 0;
       if (val > totalPages) val = totalPages;
-      if (val !== currentPage) {
-        turnPage(val);
-      }
+      if (val !== currentPage) turnPage(val);
     });
 
     function turnPage(targetPage) {
       stopCurrentAudio();
-
-      bookPage.classList.remove('page-anim');
-      void bookPage.offsetWidth; // Force reflow
-      bookPage.classList.add('page-anim');
-
-      document.querySelector('.active')?.classList.remove('active');
+      document.querySelector('.notebook-sheet.active, .cover-sheet.active')?.classList.remove('active');
       currentPage = targetPage;
+
       const targetSheet = document.getElementById(`sheet-${currentPage}`);
       if (targetSheet) targetSheet.classList.add('active');
 
@@ -480,7 +460,6 @@
 
     function updateUIState() {
       pageJumpInput.value = currentPage;
-
       if (currentPage === 0) {
         toolBarContainer.style.display = "none";
       } else {
@@ -489,10 +468,9 @@
       }
     }
 
-    // Load Content for Current Page
+    // Load Data for Page
     function loadPageContent(page) {
       if (page === 0) return;
-
       const sheet = document.getElementById(`sheet-${page}`);
       if (!sheet) return;
 
@@ -512,16 +490,13 @@
         playBtn.disabled = true;
       }
 
-      // Clear previous photos
       sheet.querySelectorAll('.scrapbook-photo').forEach(el => el.remove());
-
-      // Render photos
       if (data.photos) {
         data.photos.forEach(p => createPhotoElement(sheet, p.src, p.x, p.y, p.w));
       }
     }
 
-    // Create Photo Element with Delete Button
+    // Photo Element Creation
     function createPhotoElement(sheet, src, x = 60, y = 40, w = 130) {
       const wrapper = document.createElement('div');
       wrapper.className = 'scrapbook-photo';
@@ -547,7 +522,7 @@
       makeInteractive(wrapper);
     }
 
-    // Touch Dragging and Resizing
+    // Touch Dragging & Resizing
     function makeInteractive(element) {
       interact(element)
         .draggable({
@@ -579,9 +554,8 @@
         });
     }
 
-    // Attach Dynamic Events
+    // Attach File and Audio Listeners
     function attachDynamicEvents() {
-      // Photo Upload
       document.getElementById('photoInput').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file && currentPage > 0) {
@@ -594,7 +568,6 @@
         }
       });
 
-      // Audio Upload
       document.querySelectorAll('.audioInput').forEach(input => {
         input.addEventListener('change', (e) => {
           const pageNum = input.getAttribute('data-page');
@@ -612,11 +585,9 @@
         });
       });
 
-      // Play / Pause Toggle Buttons
       document.querySelectorAll('.btnPlay').forEach(btn => {
         btn.addEventListener('click', () => {
           const pageNum = btn.getAttribute('data-page');
-
           if (isPlaying) {
             bgAudio.pause();
             isPlaying = false;
@@ -671,7 +642,7 @@
       }
     });
 
-    // Firebase Real-Time Synchronization Listener
+    // Firebase Listener
     window.addEventListener('load', () => {
       let checkInterval = setInterval(() => {
         if (window.scrapbookDB) {
