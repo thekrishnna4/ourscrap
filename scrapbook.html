@@ -143,14 +143,12 @@
       display: block;
     }
 
-    /* Lined Notebook Page Flex Layout */
+    /* Lined Notebook Page */
     .notebook-sheet {
       width: 100%;
       height: 100%;
       position: relative;
       display: none;
-      flex-direction: column;
-      justify-content: space-between;
       background-image: 
         linear-gradient(to right, transparent 36px, var(--margin-pink) 36px, var(--margin-pink) 38px, transparent 38px),
         linear-gradient(to bottom, transparent 27px, var(--line-blue) 28px);
@@ -162,25 +160,19 @@
     }
 
     .notebook-sheet.active {
-      display: flex;
-      animation: pageTurn 0.3s ease-out;
+      display: block;
+      animation: pageFade 0.25s ease-out;
     }
 
-    @keyframes pageTurn {
-      0% {
-        opacity: 0.3;
-        transform: translateX(16px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    @keyframes pageFade {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
     }
 
-    /* Text Area - Strictly takes remaining vertical space */
+    /* Pure Textarea aligned cleanly with notebook lines */
     .notebook-text {
       width: 100%;
-      flex: 1 1 auto;
+      height: 100%;
       background: transparent;
       border: none;
       outline: none;
@@ -189,34 +181,8 @@
       line-height: 28px;
       color: #2c2829;
       resize: none;
-      margin-bottom: 12px;
       white-space: pre-wrap;
       overflow-y: auto;
-    }
-
-    /* Audio Bar - Fixed to bottom of sheet with flex-shrink */
-    .audio-widget {
-      width: 100%;
-      height: 40px;
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.96);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 6;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    .audio-filename {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      flex-grow: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     /* Photos */
@@ -262,14 +228,37 @@
       z-index: 10;
     }
 
-    /* Bottom Controls */
+    /* Bottom Controls Layout */
     .bottom-controls {
       width: 100%;
       max-width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       padding: 6px 0;
+    }
+
+    /* Audio Bar - Placed neatly above toolbar buttons */
+    .audio-widget {
+      width: 100%;
+      height: 40px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .audio-filename {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .tool-buttons {
@@ -365,8 +354,21 @@
     </div>
   </div>
 
-  <!-- Bottom Toolbar & Page Controls -->
+  <!-- Bottom Controls Container -->
   <div class="bottom-controls">
+    
+    <!-- Audio Bar (Hidden on Cover Page 0) -->
+    <div class="audio-widget" id="audioWidget" style="display: none;">
+      <span>🎵</span>
+      <span class="audio-filename" id="audioFileName">No audio attached</span>
+      <label class="btn-tool" style="padding: 3px 10px; font-size: 0.75rem;">
+        Upload
+        <input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
+      </label>
+      <button class="btn-tool" id="btnPlayAudio" style="padding: 3px 10px; font-size: 0.75rem;" disabled>Play</button>
+    </div>
+
+    <!-- Action Tool Buttons -->
     <div class="tool-buttons" id="toolBarContainer" style="display: none;">
       <label class="btn-tool">
         📷 Add Photo
@@ -375,6 +377,7 @@
       <button class="btn-tool" id="btnSave">💾 Save Page</button>
     </div>
 
+    <!-- Page Navigation Bar -->
     <div class="nav-bar">
       <button class="btn-nav" id="btnPrev">‹</button>
       <div class="page-indicator-wrapper">
@@ -398,6 +401,10 @@
     const pagesContainer = document.getElementById('pagesContainer');
     const pageJumpInput = document.getElementById('pageJumpInput');
     const toolBarContainer = document.getElementById('toolBarContainer');
+    const audioWidget = document.getElementById('audioWidget');
+    const audioFileName = document.getElementById('audioFileName');
+    const btnPlayAudio = document.getElementById('btnPlayAudio');
+    const audioFileInput = document.getElementById('audioFileInput');
     const syncStatus = document.getElementById('syncStatus');
     const bgAudio = document.getElementById('bgAudio');
 
@@ -407,32 +414,20 @@
         const sheet = document.createElement('div');
         sheet.className = 'notebook-sheet';
         sheet.id = `sheet-${i}`;
-        sheet.innerHTML = `
-          <textarea class="notebook-text" placeholder="Write page ${i} memories here..."></textarea>
-          <div class="audio-widget">
-            <span>🎵</span>
-            <span class="audio-filename">No audio attached</span>
-            <label class="btn-tool" style="padding: 2px 8px; font-size: 0.7rem;">
-              Upload
-              <input type="file" class="audioInput" data-page="${i}" accept="audio/*" style="display: none;">
-            </label>
-            <button class="btn-tool btnPlay" data-page="${i}" style="padding: 2px 8px; font-size: 0.7rem;" disabled>Play</button>
-          </div>
-        `;
+        sheet.innerHTML = `<textarea class="notebook-text" placeholder="Write page ${i} memories here..."></textarea>`;
         pagesContainer.appendChild(sheet);
       }
-      attachDynamicEvents();
     }
 
     generatePages();
 
-    // Stop audio playback
+    // Stop playback
     function stopCurrentAudio() {
       if (bgAudio) {
         bgAudio.pause();
         bgAudio.currentTime = 0;
         isPlaying = false;
-        document.querySelectorAll('.btnPlay').forEach(btn => btn.textContent = 'Play');
+        btnPlayAudio.textContent = "Play";
       }
     }
 
@@ -468,8 +463,10 @@
       pageJumpInput.value = currentPage;
       if (currentPage === 0) {
         toolBarContainer.style.display = "none";
+        audioWidget.style.display = "none";
       } else {
         toolBarContainer.style.display = "flex";
+        audioWidget.style.display = "flex";
         loadPageContent(currentPage);
       }
     }
@@ -481,19 +478,16 @@
       if (!sheet) return;
 
       const textarea = sheet.querySelector('.notebook-text');
-      const filenameSpan = sheet.querySelector('.audio-filename');
-      const playBtn = sheet.querySelector('.btnPlay');
-
       const data = pageData[page] || { text: '', audio: null, audioName: '', photos: [] };
       textarea.value = data.text || '';
 
       if (data.audioName) {
-        filenameSpan.textContent = data.audioName;
+        audioFileName.textContent = data.audioName;
         activeAudioData[page] = data.audio;
-        playBtn.disabled = false;
+        btnPlayAudio.disabled = false;
       } else {
-        filenameSpan.textContent = "No audio attached";
-        playBtn.disabled = true;
+        audioFileName.textContent = "No audio attached";
+        btnPlayAudio.disabled = true;
       }
 
       sheet.querySelectorAll('.scrapbook-photo').forEach(el => el.remove());
@@ -502,7 +496,7 @@
       }
     }
 
-    // Photo Element Creation
+    // Photo Creation
     function createPhotoElement(sheet, src, x = 60, y = 40, w = 130) {
       const wrapper = document.createElement('div');
       wrapper.className = 'scrapbook-photo';
@@ -560,59 +554,52 @@
         });
     }
 
-    // Attach File and Audio Listeners
-    function attachDynamicEvents() {
-      document.getElementById('photoInput').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file && currentPage > 0) {
-          const reader = new FileReader();
-          reader.onload = function(evt) {
-            const sheet = document.getElementById(`sheet-${currentPage}`);
-            createPhotoElement(sheet, evt.target.result);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
+    // Photo Upload Listener
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && currentPage > 0) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const sheet = document.getElementById(`sheet-${currentPage}`);
+          createPhotoElement(sheet, evt.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-      document.querySelectorAll('.audioInput').forEach(input => {
-        input.addEventListener('change', (e) => {
-          const pageNum = input.getAttribute('data-page');
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-              activeAudioData[pageNum] = evt.target.result;
-              const sheet = document.getElementById(`sheet-${pageNum}`);
-              sheet.querySelector('.audio-filename').textContent = file.name;
-              sheet.querySelector('.btnPlay').disabled = false;
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-      });
+    // Audio Upload Listener
+    audioFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && currentPage > 0) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          activeAudioData[currentPage] = evt.target.result;
+          audioFileName.textContent = file.name;
+          btnPlayAudio.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-      document.querySelectorAll('.btnPlay').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const pageNum = btn.getAttribute('data-page');
-          if (isPlaying) {
-            bgAudio.pause();
+    // Audio Play/Pause Button
+    btnPlayAudio.addEventListener('click', () => {
+      if (isPlaying) {
+        bgAudio.pause();
+        isPlaying = false;
+        btnPlayAudio.textContent = "Play";
+      } else {
+        if (activeAudioData[currentPage]) {
+          bgAudio.src = activeAudioData[currentPage];
+          bgAudio.play();
+          isPlaying = true;
+          btnPlayAudio.textContent = "Pause";
+          bgAudio.onended = () => {
+            btnPlayAudio.textContent = "Play";
             isPlaying = false;
-            btn.textContent = "Play";
-          } else {
-            if (activeAudioData[pageNum]) {
-              bgAudio.src = activeAudioData[pageNum];
-              bgAudio.play();
-              isPlaying = true;
-              btn.textContent = "Pause";
-              bgAudio.onended = () => {
-                btn.textContent = "Play";
-                isPlaying = false;
-              };
-            }
-          }
-        });
-      });
-    }
+          };
+        }
+      }
+    });
 
     // Save Page Data to Firebase
     document.getElementById('btnSave').addEventListener('click', () => {
@@ -632,7 +619,7 @@
       const currentData = {
         text: sheet.querySelector('.notebook-text').value,
         audio: activeAudioData[currentPage] || null,
-        audioName: sheet.querySelector('.audio-filename').textContent !== "No audio attached" ? sheet.querySelector('.audio-filename').textContent : "",
+        audioName: audioFileName.textContent !== "No audio attached" ? audioFileName.textContent : "",
         photos: photos
       };
 
@@ -648,7 +635,7 @@
       }
     });
 
-    // Firebase Listener
+    // Firebase Realtime Listener
     window.addEventListener('load', () => {
       let checkInterval = setInterval(() => {
         if (window.scrapbookDB) {
