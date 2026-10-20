@@ -175,3 +175,119 @@
       color: var(--text-main);
       margin-bottom: 24px;
       letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    /* Minimalist Button */
+    .btn-enter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background-color: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(232, 180, 184, 0.25);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      min-height: 48px;
+      width: auto;
+      min-width: 200px;
+    }
+
+    .btn-enter:hover {
+      background-color: #fff9fa;
+      border-color: var(--accent-pink);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(232, 180, 184, 0.35);
+    }
+
+    .btn-enter:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 2px 8px rgba(232, 180, 184, 0.2);
+    }
+
+    .btn-heart-icon {
+      font-size: 1rem;
+      color: var(--accent-pink);
+      transition: transform 0.3s ease;
+    }
+
+    .btn-enter:hover .btn-heart-icon {
+      transform: scale(1.2);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Small Screen Adjustments */
+    @media (max-height: 660px) {
+      .photo-wrapper {
+        max-width: 210px;
+        margin-bottom: 20px;
+      }
+      .title {
+        font-size: 1.8rem;
+        margin-bottom: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Backgrounds -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- Floating Aesthetic Background Doodles -->
+  <div class="bg-doodles">
+    <div class="doodle doodle-1">♡</div>
+    <div class="doodle doodle-2">✦</div>
+    <div class="doodle doodle-3">✧</div>
+    <div class="doodle doodle-4">☁</div>
+    <div class="doodle doodle-5">❀</div>
+    <div class="doodle doodle-6">♡</div>
+    <div class="doodle doodle-7">✦</div>
+    <div class="doodle doodle-8">✧</div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="container">
+    
+    <!-- Central Polaroid Photo -->
+    <div class="photo-wrapper">
+      <div class="tape-doodle"></div>
+      <div class="photo-frame">
+        <!-- Replace 'photo.jpg' with your photo filename or URL -->
+        <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&q=80&w=800" alt="Us" id="landingPhoto">
+      </div>
+    </div>
+
+    <!-- Title Header -->
+    <h1 class="title">a quiet little corner for us</h1>
+
+    <!-- Minimalist Button to Scrapbook Page -->
+    <a href="scrapbook.html" class="btn-enter">
+      <span>Open Our Scrapbook</span>
+      <span class="btn-heart-icon">♡</span>
+    </a>
+
+  </main>
+
+</body>
+</html>
