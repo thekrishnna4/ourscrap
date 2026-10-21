@@ -506,68 +506,89 @@
       }
 
       sheet.querySelectorAll('.scrapbook-photo').forEach(el => el.remove());
-      if (data.photos) {
-        data.photos.forEach(p => createPhotoElement(sheet, p.src, p.x, p.y, p.w));
-      }
+if (data.photos) {
+  data.photos.forEach(p => createPhotoElement(sheet, p.src, p.x, p.y, p.w, p.angle || 0));
+}
     }
 
     // Photo Creation
-    function createPhotoElement(sheet, src, x = 60, y = 40, w = 130) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'scrapbook-photo';
-      wrapper.style.transform = `translate(${x}px, ${y}px)`;
-      wrapper.style.width = `${w}px`;
-      wrapper.setAttribute('data-x', x);
-      wrapper.setAttribute('data-y', y);
+    // Replace your old createPhotoElement function with this:
+function createPhotoElement(sheet, src, x = 60, y = 40, w = 130, angle = 0) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'scrapbook-photo';
+  wrapper.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+  wrapper.style.width = `${w}px`;
+  wrapper.setAttribute('data-x', x);
+  wrapper.setAttribute('data-y', y);
+  wrapper.setAttribute('data-angle', angle);
 
-      const img = document.createElement('img');
-      img.src = src;
-      wrapper.appendChild(img);
+  const img = document.createElement('img');
+  img.src = src;
+  wrapper.appendChild(img);
 
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn-delete-photo';
-      delBtn.textContent = '✕';
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        wrapper.remove();
-      };
-      wrapper.appendChild(delBtn);
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn-delete-photo';
+  delBtn.textContent = '✕';
+  delBtn.onclick = (e) => {
+    e.stopPropagation();
+    wrapper.remove();
+  };
+  wrapper.appendChild(delBtn);
 
-      sheet.appendChild(wrapper);
-      makeInteractive(wrapper);
+  sheet.appendChild(wrapper);
+  makeInteractive(wrapper);
+}
     }
 
     // Touch Dragging & Resizing
-    function makeInteractive(element) {
-      interact(element)
-        .draggable({
-          listeners: {
-            move(event) {
-              const target = event.target;
-              const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-              const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-              target.style.transform = `translate(${x}px, ${y}px)`;
-              target.setAttribute('data-x', x);
-              target.setAttribute('data-y', y);
-            }
-          }
-        })
-        .resizable({
-          edges: { left: true, right: true, bottom: true, top: true },
-          listeners: {
-            move(event) {
-              let { x, y } = event.target.dataset;
-              x = (parseFloat(x) || 0) + event.deltaRect.left;
-              y = (parseFloat(y) || 0) + event.deltaRect.top;
-              Object.assign(event.target.style, {
-                width: `${event.rect.width}px`,
-                transform: `translate(${x}px, ${y}px)`
-              });
-              Object.assign(event.target.dataset, { x, y });
-            }
-          }
-        });
-    }
+    // Replace your old makeInteractive function with this:
+function makeInteractive(element) {
+  interact(element)
+    .draggable({
+      listeners: {
+        move(event) {
+          const target = event.target;
+          const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+          const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+          const angle = parseFloat(target.getAttribute('data-angle')) || 0;
+
+          target.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+          target.setAttribute('data-x', x);
+          target.setAttribute('data-y', y);
+        }
+      }
+    })
+    .resizable({
+      edges: { left: true, right: true, bottom: true, top: true },
+      listeners: {
+        move(event) {
+          let { x, y } = event.target.dataset;
+          x = (parseFloat(x) || 0) + event.deltaRect.left;
+          y = (parseFloat(y) || 0) + event.deltaRect.top;
+          const angle = parseFloat(event.target.getAttribute('data-angle')) || 0;
+
+          Object.assign(event.target.style, {
+            width: `${event.rect.width}px`,
+            transform: `translate(${x}px, ${y}px) rotate(${angle}deg)`
+          });
+          Object.assign(event.target.dataset, { x, y });
+        }
+      }
+    })
+    .gesturable({
+      listeners: {
+        move(event) {
+          const target = event.target;
+          const x = parseFloat(target.getAttribute('data-x')) || 0;
+          const y = parseFloat(target.getAttribute('data-y')) || 0;
+          let angle = (parseFloat(target.getAttribute('data-angle')) || 0) + event.da;
+
+          target.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+          target.setAttribute('data-angle', angle);
+        }
+      }
+    });
+}
 
     // Photo Upload Listener
     document.getElementById('photoInput').addEventListener('change', (e) => {
@@ -623,13 +644,14 @@
       const sheet = document.getElementById(`sheet-${currentPage}`);
       const photos = [];
       sheet.querySelectorAll('.scrapbook-photo').forEach(el => {
-        photos.push({
-          src: el.querySelector('img').src,
-          x: parseFloat(el.getAttribute('data-x')) || 0,
-          y: parseFloat(el.getAttribute('data-y')) || 0,
-          w: parseFloat(el.style.width) || 130
-        });
-      });
+  photos.push({
+    src: el.querySelector('img').src,
+    x: parseFloat(el.getAttribute('data-x')) || 0,
+    y: parseFloat(el.getAttribute('data-y')) || 0,
+    w: parseFloat(el.style.width) || 130,
+    angle: parseFloat(el.getAttribute('data-angle')) || 0
+  });
+});
 
       const currentData = {
         text: sheet.querySelector('.notebook-text').value,
